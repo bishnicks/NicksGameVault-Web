@@ -25,7 +25,7 @@ function paint() {
   const on = isAudioOn();
   btn.textContent = on ? "🔊" : "🔇"; // the slashed speaker IS the "off" state
   btn.classList.toggle("is-muted", !on);
-  btn.setAttribute("aria-label", on ? "Disattiva audio" : "Attiva audio");
+  btn.setAttribute("aria-label", on ? "Mute audio" : "Unmute audio");
 }
 
 /** Wire the toggle and apply the saved preferences. Call once at startup. */

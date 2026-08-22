@@ -10,10 +10,10 @@ import { formatDuration } from "../format.js";
 // Share text from the spec, extended with the lifetime + time lines; encoded at click time.
 function whatsappUrl(run, lifetime, timeMs) {
   const text =
-    `Ho finito il gioco e sono la Principessa Perfetta! ❤️ ` +
-    `Ci ho messo ${formatDuration(timeMs)}! ` +
-    `Preparati, ti devo ${run} coccoline! ` +
-    `(Totale storico: ${lifetime} coccoline)`;
+    `I finished the game and became the Perfect Princess! ❤️ ` +
+    `My time was ${formatDuration(timeMs)}! ` +
+    `I earned ${run} cuddle coins ` +
+    `(${lifetime} lifetime)!`;
   return `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
 }
 

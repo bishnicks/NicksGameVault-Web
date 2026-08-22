@@ -19,7 +19,7 @@ const AIR = airFor(H);
 
 export const LEVEL_3 = {
   id: 3,
-  name: "Tetti d'Oriente",
+  name: "Eastern Rooftops",
   tileSize: 64,
 
   // Tetti al tramonto: cielo viola/oro, pagode in lontananza.

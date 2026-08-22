@@ -18,7 +18,7 @@ const AIR = airFor(H);
 
 export const LEVEL_2 = {
   id: 2,
-  name: "Abissi di Corallo",
+  name: "Coral Depths",
   tileSize: 64,
 
   // Sottomarino: bolle, blu e corallo.

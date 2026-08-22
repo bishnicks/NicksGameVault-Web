@@ -21,7 +21,7 @@ export function registerLoadingScene() {
     ]);
 
     k.add([
-      k.text("Caricamento...", { size: 28 }),
+      k.text("Loading...", { size: 28 }),
       k.pos(GAME_W / 2, GAME_H / 2 + 20),
       k.anchor("center"),
       k.color(...PALETTE.cream),

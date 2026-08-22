@@ -19,7 +19,7 @@ const AIR = airFor(H);
 
 export const LEVEL_4 = {
   id: 4,
-  name: "Cime Innevate",
+  name: "Snowy Peaks",
   tileSize: 64,
 
   // Vetta innevata: cielo pallido, picchi e neve che cade.

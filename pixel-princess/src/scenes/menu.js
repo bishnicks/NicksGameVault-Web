@@ -101,7 +101,7 @@ export function registerMenuScene() {
 
     // --- Start layer ---
     startLayer.add([
-      k.text("Un viaggio in sei mondi incantati", { size: 28 }),
+      k.text("A journey through six enchanted worlds", { size: 28 }),
       k.pos(GAME_W / 2, 200),
       k.anchor("center"),
       k.color(...PALETTE.cream),
@@ -144,7 +144,7 @@ export function registerMenuScene() {
         y: GAME_H / 2 - 10,
         w: 420,
         h: 90,
-        label: resumeFinale ? "Rivedi il Gran Ballo" : `Riprendi · Livello ${savedLevel}`,
+        label: resumeFinale ? "Replay the Grand Ball" : `Resume · Level ${savedLevel}`,
         onClick: () => {
           // Start the destination's track within this gesture (unlocks the AudioContext).
           if (resumeFinale) playBgm("finale-bgm", 0.34);
@@ -165,7 +165,7 @@ export function registerMenuScene() {
         y: GAME_H / 2 + 130,
         w: 300,
         h: 76,
-        label: "Nuova partita",
+        label: "New Game",
         onClick: openChooser,
         base: PALETTE.cream,
       });
@@ -187,7 +187,7 @@ export function registerMenuScene() {
       y: GAME_H - 120,
       w: 220,
       h: 56,
-      label: "Classifica",
+      label: "Leaderboard",
       onClick: () => {
         sfx("select");
         openLeaderboardReadOnly();
@@ -199,7 +199,7 @@ export function registerMenuScene() {
       y: GAME_H - 56,
       w: 220,
       h: 56,
-      label: "Impostazioni",
+      label: "Settings",
       onClick: () => {
         sfx("select");
         showSettings();
@@ -210,7 +210,7 @@ export function registerMenuScene() {
     // --- Character chooser layer ---
     // Label at y=180 (spans ~162-198) clears the card top edge (240, ~232 when hover-scaled).
     chooserLayer.add([
-      k.text("Scegli la tua eroina", { size: 36 }),
+      k.text("Choose Your Heroine", { size: 36 }),
       k.pos(GAME_W / 2, 180),
       k.anchor("center"),
       k.color(...PALETTE.cream),

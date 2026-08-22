@@ -17,7 +17,7 @@ const AIR = airFor(H);
 
 export const LEVEL_5 = {
   id: 5,
-  name: "Giardino del Crepuscolo",
+  name: "Twilight Garden",
   tileSize: 64,
 
   // Giardino al crepuscolo: cielo viola/rosa, siepi scure, petali alla deriva.

@@ -24,10 +24,10 @@ export const CHARACTERS = [
   {
     id: "anna",
     name: "Anna",
-    tagline: "La Protagonista",
+    tagline: "The Heroine",
     // Romantic one-liner shown on the selection card (keep it short + bracket-free — k.text
     // crashes on tokens like [x]). Edit freely.
-    description: "Dolce e coraggiosa, conquista ogni cuore al primo sguardo.",
+    description: "Sweet and brave, she wins every heart at first sight.",
     sprite: "anna",
     color: PALETTE.sky,
   },
@@ -35,9 +35,9 @@ export const CHARACTERS = [
     // Nome-concetto ORIGINALE (non un personaggio Disney): evita problemi di marchio essendo il
     // gioco pubblico. id + sprite restano "sognatrice" (compatibilità localStorage + asset).
     id: "sognatrice",
-    name: "Sognatrice",
-    tagline: "Anima Gentile",
-    description: "Sogna l'amore vero tra le rose del castello incantato.",
+    name: "Dreamer",
+    tagline: "Gentle Soul",
+    description: "She dreams of true love among the enchanted castle roses.",
     sprite: "sognatrice",
     color: [240, 198, 116],
   },
@@ -45,9 +45,9 @@ export const CHARACTERS = [
     // Nome-concetto ORIGINALE (non un personaggio Disney). id + sprite restano "avventuriera";
     // palette terracotta del deserto, spirito libero.
     id: "avventuriera",
-    name: "Avventuriera",
-    tagline: "Spirito Libero",
-    description: "Il suo cuore libero corre dove la porta il vento del deserto.",
+    name: "Adventurer",
+    tagline: "Free Spirit",
+    description: "Her free heart runs wherever the desert wind carries her.",
     sprite: "avventuriera",
     color: [196, 122, 88],
   },
@@ -69,12 +69,12 @@ export const LIVES = {
 // are cleared. `afterLevel` is the level whose completion unlocks the layer; the keys are
 // sprite asset keys (see ASSETS.sprites). Order = paint order (skirt under … under crown).
 export const SKINS = [
-  { key: "skirt", name: "Gonna Reale", afterLevel: 1 },
-  { key: "bodice", name: "Corpetto Elegante", afterLevel: 2 },
-  { key: "necklace", name: "Collana di Gioielli", afterLevel: 3 },
-  { key: "crown", name: "Corona Reale", afterLevel: 4 },
-  { key: "gloves", name: "Guanti di Seta", afterLevel: 5 },
-  { key: "cape", name: "Mantello Reale", afterLevel: 6 },
+  { key: "skirt", name: "Royal Skirt", afterLevel: 1 },
+  { key: "bodice", name: "Elegant Bodice", afterLevel: 2 },
+  { key: "necklace", name: "Jeweled Necklace", afterLevel: 3 },
+  { key: "crown", name: "Royal Crown", afterLevel: 4 },
+  { key: "gloves", name: "Silk Gloves", afterLevel: 5 },
+  { key: "cape", name: "Royal Cape", afterLevel: 6 },
 ];
 
 // Which skins are worn while playing a given level (derived from progress, not stored):
@@ -116,16 +116,16 @@ export const HAZARDS = {
 // gift's emotional centerpiece: edit `message` freely (keep it bracket-free and stick to
 // widely-shipped emoji like 👑 ✨ 💎 — newer ones render as tofu boxes on Win10).
 export const FINALE = {
-  heroineTitle: "Principessa Perfetta", // caption above the avatar
-  title: "Per Anna", // message-box heading
+  heroineTitle: "Perfect Princess", // caption above the avatar
+  title: "For Anna", // message-box heading
   message:
-    "Hai attraversato foreste incantate, abissi di corallo,\n" +
-    "tetti d'oriente e cime innevate...\n" +
-    "hai danzato tra i petali del giardino al crepuscolo\n" +
-    "e superato il custode del castello.\n" +
-    "A ogni passo sei diventata piu te stessa.\n\n" +
-    "Le porte della sala da ballo sono aperte.\n" +
-    "Buon viaggio, principessa.",
+    "You crossed enchanted forests and coral depths,\n" +
+    "eastern rooftops and snowy peaks...\n" +
+    "you danced through the twilight garden petals\n" +
+    "and defeated the castle guardian.\n" +
+    "With every step, you became more yourself.\n\n" +
+    "The ballroom doors are open.\n" +
+    "Enjoy the journey, princess.",
 };
 
 // Platformer tunables. Centralised so entity/level code stays free of magic

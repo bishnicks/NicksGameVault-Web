@@ -59,7 +59,7 @@ export function bindAudioDebug() {
   const lines = document.createElement("div");
 
   const btn = document.createElement("button");
-  btn.textContent = "▶ Test suono";
+  btn.textContent = "▶ Test sound";
   Object.assign(btn.style, { marginTop: "6px", font: "12px monospace", cursor: "pointer" });
 
   let lastTest = "—";

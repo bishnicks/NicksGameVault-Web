@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <!-- Mobile-first, landscape platformer. viewport-fit=cover handles iPhone notch.
@@ -42,9 +42,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Principessa" />
+    <meta name="apple-mobile-web-app-title" content="Pixel Princess" />
     <link rel="icon" type="image/png" href="./assets/icons/icon-192.png" />
-    <link rel="stylesheet" href="./style.css" />
+    <link rel="stylesheet" href="./style.css?v=2" />
   </head>
   <body>
     <a id="vault-home" href="../arcade-launcher.html" aria-label="Return to Nick's Game Vault">Game Hub</a>
@@ -63,7 +63,7 @@
     <div id="rotate-overlay">
       <div class="rotate-inner">
         <div class="rotate-icon">🔄</div>
-        <p>Ruota il dispositivo in orizzontale</p>
+        <p>Turn your device sideways</p>
       </div>
     </div>
 
@@ -71,40 +71,40 @@
          wired in src/controls.js via pointer/touch events. -->
     <div id="touch-controls">
       <div id="dpad">
-        <button id="btn-left" type="button" aria-label="Sinistra">◀</button>
-        <button id="btn-right" type="button" aria-label="Destra">▶</button>
+        <button id="btn-left" type="button" aria-label="Left">◀</button>
+        <button id="btn-right" type="button" aria-label="Right">▶</button>
       </div>
-      <button id="btn-jump" type="button" aria-label="Salto">⤴</button>
+      <button id="btn-jump" type="button" aria-label="Jump">⤴</button>
     </div>
 
     <!-- Single audio toggle (top-right): one tap silences BOTH buses (music + effects) and the
          glyph flips to the slashed speaker, so "off" is unmistakable. Wired in
          src/ui/audioToggle.js; the per-bus volume sliders still live in the settings overlay. -->
-    <button id="audio-toggle" type="button" aria-label="Disattiva audio">🔊</button>
+    <button id="audio-toggle" type="button" aria-label="Mute audio">🔊</button>
 
     <!-- Pause button (top-left), shown only during gameplay (body.playing). Works on
          keyboard (ESC) and touch alike; wired in src/scenes/game.js. -->
-    <button id="pause-toggle" type="button" aria-label="Pausa">⏸</button>
+    <button id="pause-toggle" type="button" aria-label="Pause">⏸</button>
 
     <!-- iOS-only "Add to Home" hint. iPhone Safari tabs can't go true fullscreen, so the
          installed PWA is the way; shown + dismissed by src/ui/installHint.js. -->
     <div id="install-hint" hidden>
       <span class="install-text">
-        <strong>📲 Gioca a schermo intero</strong>
-        Tocca <b>Condividi</b> ⬆️ in basso, poi «Aggiungi a Home»
+        <strong>📲 Play full screen</strong>
+        Tap <b>Share</b> ⬆️, then “Add to Home Screen”
       </span>
-      <button id="install-close" type="button" aria-label="Chiudi suggerimento">✕</button>
+      <button id="install-close" type="button" aria-label="Close tip">✕</button>
     </div>
 
     <!-- Pause menu overlay. DOM, not Kaplay; shown/wired by src/ui/pauseMenu.js while the
          game scene freezes the world (k.getTreeRoot().paused). -->
     <div id="pause-overlay" class="overlay" hidden>
       <div class="overlay-card pause-card">
-        <p class="pause-title">In pausa</p>
-        <button id="pause-resume" type="button" class="ui-btn">Riprendi</button>
-        <button id="pause-settings" type="button" class="ui-btn ghost-btn">Impostazioni</button>
-        <button id="pause-restart" type="button" class="ui-btn ghost-btn">Ricomincia il livello</button>
-        <button id="pause-menu" type="button" class="ui-btn ghost-btn">Torna al menu</button>
+        <p class="pause-title">Paused</p>
+        <button id="pause-resume" type="button" class="ui-btn">Resume</button>
+        <button id="pause-settings" type="button" class="ui-btn ghost-btn">Settings</button>
+        <button id="pause-restart" type="button" class="ui-btn ghost-btn">Restart level</button>
+        <button id="pause-menu" type="button" class="ui-btn ghost-btn">Main menu</button>
       </div>
     </div>
 
@@ -112,17 +112,17 @@
          menu and from the pause menu. Placed after #pause-overlay so it stacks above it. -->
     <div id="settings-overlay" class="overlay" hidden>
       <div class="overlay-card settings-card">
-        <p class="pause-title">Impostazioni</p>
+        <p class="pause-title">Settings</p>
         <label class="setting-row">
-          <span>Musica</span>
-          <input id="set-music-vol" type="range" min="0" max="100" step="1" aria-label="Volume musica" />
+          <span>Music</span>
+          <input id="set-music-vol" type="range" min="0" max="100" step="1" aria-label="Music volume" />
         </label>
         <label class="setting-row">
-          <span>Effetti</span>
-          <input id="set-sfx-vol" type="range" min="0" max="100" step="1" aria-label="Volume effetti" />
+          <span>Effects</span>
+          <input id="set-sfx-vol" type="range" min="0" max="100" step="1" aria-label="Effects volume" />
         </label>
-        <button id="settings-reset" type="button" class="ui-btn ghost-btn">Cancella i progressi</button>
-        <button id="settings-close" type="button" class="ui-btn">Chiudi</button>
+        <button id="settings-reset" type="button" class="ui-btn ghost-btn">Erase progress</button>
+        <button id="settings-close" type="button" class="ui-btn">Close</button>
       </div>
     </div>
 
@@ -131,11 +131,11 @@
     <div id="coin-overlay" class="overlay" hidden>
       <div class="overlay-card coin-card">
         <p class="coin-text">
-          Ops! Hai sbagliato.<br />
-          Inserisci <strong>500 Coccoline</strong> per continuare.
+          Oops! You missed.<br />
+          Spend <strong>500 cuddle coins</strong> to continue.
         </p>
-        <p class="coin-lives">Vite rimaste: <span id="coin-lives-count">3</span> ♥</p>
-        <button id="coin-btn" type="button" class="ui-btn">Inserisci Coin</button>
+        <p class="coin-lives">Lives remaining: <span id="coin-lives-count">3</span> ♥</p>
+        <button id="coin-btn" type="button" class="ui-btn">Continue</button>
       </div>
     </div>
 
@@ -145,11 +145,11 @@
       <div class="overlay-card gameover-card">
         <p class="gameover-title">Game Over</p>
         <p class="coin-text">
-          Hai esaurito le vite!<br />
-          La principessa ricomincia il viaggio dall'inizio.<br />
-          <span class="gameover-note">(Le Coccoline restano sul conto 😉)</span>
+          You are out of lives!<br />
+          The princess will restart her journey.<br />
+          <span class="gameover-note">(Your cuddle-coin total remains 😉)</span>
         </p>
-        <button id="gameover-btn" type="button" class="ui-btn">Ricomincia da capo</button>
+        <button id="gameover-btn" type="button" class="ui-btn">Start over</button>
       </div>
     </div>
 
@@ -157,16 +157,16 @@
     <div id="receipt-overlay" class="overlay" hidden>
       <div class="overlay-card receipt-card">
         <div class="receipt-head">SCONTRINO</div>
-        <div class="receipt-sub">Principessa Perfetta S.p.A.</div>
+        <div class="receipt-sub">Perfect Princess Adventures</div>
         <div class="receipt-rule"></div>
-        <p class="receipt-line">Costo di questa avventura:</p>
-        <p class="receipt-total"><span id="receipt-amount">0</span> Coccoline</p>
-        <p class="receipt-line">Totale storico: <span id="receipt-lifetime">0</span> Coccoline</p>
-        <p class="receipt-line">Tempo di gioco: <span id="receipt-time">0:00</span></p>
+        <p class="receipt-line">Cost of this adventure:</p>
+        <p class="receipt-total"><span id="receipt-amount">0</span> cuddle coins</p>
+        <p class="receipt-line">Lifetime total: <span id="receipt-lifetime">0</span> cuddle coins</p>
+        <p class="receipt-line">Play time: <span id="receipt-time">0:00</span></p>
         <div class="receipt-rule"></div>
-        <p class="receipt-foot">Grazie per aver giocato ❤️</p>
-        <button id="receipt-pay" type="button" class="ui-btn pay-btn">Paga il Debito!</button>
-        <button id="receipt-close" type="button" class="ui-btn ghost-btn">Chiudi</button>
+        <p class="receipt-foot">Thanks for playing ❤️</p>
+        <button id="receipt-pay" type="button" class="ui-btn pay-btn">Share My Victory!</button>
+        <button id="receipt-close" type="button" class="ui-btn ghost-btn">Close</button>
       </div>
     </div>
 
@@ -176,39 +176,39 @@
          row, so the list is paged (#lb-pager). -->
     <div id="leaderboard-overlay" class="overlay" hidden>
       <div class="overlay-card leaderboard-card">
-        <p class="pause-title">Classifica</p>
+        <p class="pause-title">Leaderboard</p>
         <div id="lb-form">
           <p id="lb-invite" class="lb-invite" hidden>
-            🏆 Hai finito il viaggio!<br />Metti il tuo tempo in classifica
+            🏆 You finished the journey!<br />Add your time to the leaderboard
           </p>
-          <p class="lb-prompt">Il tuo punteggio: <span id="lb-score">0</span> ★</p>
-          <p class="lb-prompt">Il tuo tempo: <span id="lb-time">0:00</span> ⏱</p>
+          <p class="lb-prompt">Your score: <span id="lb-score">0</span> ★</p>
+          <p class="lb-prompt">Your time: <span id="lb-time">0:00</span> ⏱</p>
           <input
             id="nickname-input"
             type="text"
             maxlength="16"
-            placeholder="Il tuo nome"
+            placeholder="Your name"
             autocomplete="off"
             autocapitalize="off"
             spellcheck="false"
           />
-          <button id="lb-submit" type="button" class="ui-btn">Invia in classifica</button>
+          <button id="lb-submit" type="button" class="ui-btn">Submit score</button>
         </div>
         <ol id="lb-list" class="lb-list"></ol>
         <div id="lb-pager" class="lb-pager" hidden>
-          <button id="lb-prev" type="button" class="lb-page-btn" aria-label="Pagina precedente">‹ Prec</button>
+          <button id="lb-prev" type="button" class="lb-page-btn" aria-label="Previous page">‹ Previous</button>
           <span id="lb-range" class="lb-range"></span>
-          <button id="lb-next" type="button" class="lb-page-btn" aria-label="Pagina successiva">Succ ›</button>
+          <button id="lb-next" type="button" class="lb-page-btn" aria-label="Next page">Next ›</button>
         </div>
         <p id="lb-status" class="lb-status"></p>
-        <button id="lb-close" type="button" class="ui-btn ghost-btn">Chiudi</button>
+        <button id="lb-close" type="button" class="ui-btn ghost-btn">Close</button>
       </div>
     </div>
 
     <!-- Scene-transition fade. Purely visual; pointer-none. -->
     <div id="fade"></div>
 
-    <script type="module" src="./src/main.js"></script>
+    <script type="module" src="./src/main.js?v=2"></script>
     <script>addEventListener('keydown',event=>{if(event.key==='Escape'&&!document.body.classList.contains('playing'))location.href='../arcade-launcher.html'});</script>
   </body>
 </html>

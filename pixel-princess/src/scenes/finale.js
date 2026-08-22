@@ -79,7 +79,7 @@ export function registerFinaleScene() {
     // completion time is on screen through the read, before the receipt/leaderboard appear.
     // "Tempo finale M:SS" is only letters/digits/colon → the pixel font renders it (no override).
     k.add([
-      k.text(`Tempo finale  ${formatDuration(getRunTime())}`, { size: 24 }),
+      k.text(`Final time  ${formatDuration(getRunTime())}`, { size: 24 }),
       k.pos(GAME_W / 2, 44),
       k.anchor("center"),
       k.color(...PALETTE.cream),
@@ -144,7 +144,7 @@ export function registerFinaleScene() {
       k.color(...PALETTE.gold),
       k.z(30),
     ]);
-    btn.add([k.text("Torna al menu", { size: 24 }), k.anchor("center"), k.color(...PALETTE.deepBlue)]);
+    btn.add([k.text("Main Menu", { size: 24 }), k.anchor("center"), k.color(...PALETTE.deepBlue)]);
     btn.onHover(() => {
       btn.scale = k.vec2(1.05);
       k.setCursor("pointer");
@@ -176,7 +176,7 @@ export function registerFinaleScene() {
       k.z(30),
     ]);
     lbBtn.add([
-      k.text("★ Classifica", { size: 22, font: "sans-serif" }),
+      k.text("★ Leaderboard", { size: 22, font: "sans-serif" }),
       k.anchor("center"),
       k.color(...PALETTE.deepBlue),
     ]);

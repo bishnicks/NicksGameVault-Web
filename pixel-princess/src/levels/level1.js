@@ -23,7 +23,7 @@ const AIR = airFor(H);
 
 export const LEVEL_1 = {
   id: 1,
-  name: "Foresta Incantata",
+  name: "Enchanted Forest",
   tileSize: 64,
 
   // Bosco magico: verde scuro, alberi alti.

@@ -330,7 +330,7 @@ export function registerGameScene() {
       sfx("collect");
       k.destroy(key);
       keyTaken = true;
-      showBossHint("La Sala da Ballo è aperta!");
+      showBossHint("The ballroom is open!");
     });
     // Checkpoint flag (Phase 4): touching it sets the respawn point for this level —
     // deaths still cost 500 Coccoline (the meta is sacred), but the retry starts here.
@@ -628,11 +628,11 @@ export function registerGameScene() {
       // no physical wall to wedge behind. Levels without a boss skip the gate entirely.
       if (bossLevel) {
         if (k.get("boss").length > 0) {
-          showBossHint("Sconfiggi il Custode per passare!");
+          showBossHint("Defeat the Guardian to pass!");
           return;
         }
         if (!keyTaken) {
-          showBossHint("Raccogli la Chiave della Sala da Ballo!");
+          showBossHint("Collect the ballroom key!");
           return;
         }
       }
@@ -661,7 +661,7 @@ export function registerGameScene() {
 
     // --- Chapter banner that fades after a moment ---
     const banner = k.add([
-      k.text(`Capitolo ${level} — ${def.name}`, { size: 44 }),
+      k.text(`Chapter ${level} — ${def.name}`, { size: 44 }),
       k.pos(GAME_W / 2, 110),
       k.anchor("center"),
       k.color(...hudColor),
@@ -879,7 +879,7 @@ function showReward(reward, got, total, icon, nextLevel) {
     k.z(80),
   ]);
   k.add([
-    k.text("Livello completato!", { size: 50 }),
+    k.text("Level Complete!", { size: 50 }),
     k.pos(GAME_W / 2, GAME_H / 2 - 210),
     k.anchor("center"),
     k.color(...PALETTE.cream),
@@ -919,7 +919,7 @@ function showReward(reward, got, total, icon, nextLevel) {
     });
 
     k.add([
-      k.text("Hai sbloccato:", { size: 26 }),
+      k.text("You unlocked:", { size: 26 }),
       k.pos(GAME_W / 2, GAME_H / 2 + 70),
       k.anchor("center"),
       k.color(...PALETTE.cream),
@@ -951,7 +951,7 @@ function showReward(reward, got, total, icon, nextLevel) {
   // or — defensively — back to the menu.
   const more = hasLevel(nextLevel);
   const toFinale = !more && nextLevel >= MAX_LEVEL;
-  const label = more ? "Continua" : toFinale ? "Al Gran Ballo" : "Torna al menu";
+  const label = more ? "Continue" : toFinale ? "To the Grand Ball" : "Main Menu";
   const dest = more ? "game" : toFinale ? "finale" : "menu";
 
   const btn = k.add([
@@ -977,7 +977,7 @@ function showReward(reward, got, total, icon, nextLevel) {
   k.onKeyPress(["enter", "space"], proceed);
   if (toFinale) {
     k.add([
-      k.text("La tua storia ti aspetta...", { size: 18 }),
+      k.text("Your story awaits...", { size: 18 }),
       k.pos(GAME_W / 2, GAME_H / 2 + 288),
       k.anchor("center"),
       k.color(...PALETTE.cream),

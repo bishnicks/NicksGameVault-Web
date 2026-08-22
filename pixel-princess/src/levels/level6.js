@@ -21,7 +21,7 @@ const AIR = airFor(H);
 
 export const LEVEL_6 = {
   id: 6,
-  name: "Castello Reale",
+  name: "Royal Castle",
   tileSize: 64,
 
   // Interno del castello: pietra e bordeaux, ori e candele (la sala prima del ballo).

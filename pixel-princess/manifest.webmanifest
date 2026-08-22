@@ -1,7 +1,7 @@
 {
   "name": "Pixel Princess Platformer",
-  "short_name": "Principessa",
-  "description": "Un viaggio in sei mondi incantati.",
+  "short_name": "Pixel Princess",
+  "description": "A journey through six enchanted worlds.",
   "lang": "it",
   "start_url": "./",
   "scope": "./",

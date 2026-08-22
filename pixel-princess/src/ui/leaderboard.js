@@ -69,7 +69,7 @@ function renderPager() {
   pager.hidden = false;
   const from = offset + 1;
   const to = Math.min(offset + PAGE, total);
-  if (rangeEl) rangeEl.textContent = `${from}–${to} di ${total}`;
+  if (rangeEl) rangeEl.textContent = `${from}–${to} of ${total}`;
   if (prevBtn) prevBtn.disabled = offset <= 0;
   if (nextBtn) nextBtn.disabled = offset + PAGE >= total;
 }
@@ -79,14 +79,14 @@ function renderPage(pageData) {
   if (!listEl) return;
   listEl.innerHTML = "";
   if (!pageData) {
-    if (statusEl) statusEl.textContent = "Classifica non disponibile. Riprova più tardi.";
+    if (statusEl) statusEl.textContent = "Leaderboard unavailable. Try again later.";
     if (pager) pager.hidden = true;
     return;
   }
   offset = pageData.offset ?? 0;
   total = pageData.total ?? 0;
   if (total === 0) {
-    if (statusEl) statusEl.textContent = "Ancora nessun tempo. Sii la prima!";
+    if (statusEl) statusEl.textContent = "No times yet. Be the first!";
     if (pager) pager.hidden = true;
     return;
   }
@@ -124,10 +124,10 @@ function renderPage(pageData) {
 
 /** Load a page and paint it (keeps the "Caricamento…" status honest). */
 async function loadPage(next = 0) {
-  if (statusEl && !statusEl.textContent) statusEl.textContent = "Caricamento…";
+  if (statusEl && !statusEl.textContent) statusEl.textContent = "Loading…";
   const pageData = await fetchTop({ offset: Math.max(0, next), limit: PAGE });
   if (overlay?.hidden) return; // closed before the fetch resolved
-  if (statusEl && statusEl.textContent === "Caricamento…") statusEl.textContent = "";
+  if (statusEl && statusEl.textContent === "Loading…") statusEl.textContent = "";
   renderPage(pageData);
 }
 
@@ -169,8 +169,8 @@ export function openLeaderboard({ score, timeMs, inviteMode = false, onDone } = 
   if (scoreEl) scoreEl.textContent = String(score);
   if (timeEl) timeEl.textContent = formatDuration(timeMs);
   if (input) input.value = getNickname();
-  if (closeBtn) closeBtn.textContent = inviteMode ? "Salta" : "Chiudi";
-  if (statusEl) statusEl.textContent = alreadySent ? "Già in classifica ✓" : "Caricamento…";
+  if (closeBtn) closeBtn.textContent = inviteMode ? "Skip" : "Close";
+  if (statusEl) statusEl.textContent = alreadySent ? "Already submitted ✓" : "Loading…";
   if (listEl) listEl.innerHTML = "";
   if (pager) pager.hidden = true;
 
@@ -180,17 +180,17 @@ export function openLeaderboard({ score, timeMs, inviteMode = false, onDone } = 
   const send = async () => {
     const nickname = (input?.value || "").trim();
     if (!nickname) {
-      if (statusEl) statusEl.textContent = "Scrivi un nome per entrare in classifica.";
+      if (statusEl) statusEl.textContent = "Enter a name for the leaderboard.";
       input?.focus();
       return;
     }
     setNickname(nickname);
     if (submitBtn) submitBtn.disabled = true;
-    if (statusEl) statusEl.textContent = "Invio…";
+    if (statusEl) statusEl.textContent = "Submitting…";
     const pageData = await submitScore({ nickname, score, timeMs, limit: PAGE });
     if (submitBtn) submitBtn.disabled = false;
     if (!pageData) {
-      if (statusEl) statusEl.textContent = "Classifica non raggiungibile. Riprova più tardi.";
+      if (statusEl) statusEl.textContent = "Leaderboard unavailable. Try again later.";
       return;
     }
     lastSentRunKey = runKey; // never file this same run twice — it would be a duplicate row
@@ -200,12 +200,12 @@ export function openLeaderboard({ score, timeMs, inviteMode = false, onDone } = 
     if (invite) invite.hidden = true;
     if (statusEl) {
       statusEl.textContent = pageData.rank
-        ? `Sei in classifica al posto ${pageData.rank}! 🎉`
-        : "Tempo inviato! 🎉";
+        ? `You are number ${pageData.rank} on the leaderboard! 🎉`
+        : "Time submitted! 🎉";
     }
     // The endpoint already answered with the page CONTAINING this run, so she lands on herself.
     renderPage(pageData);
-    if (closeBtn) closeBtn.textContent = "Chiudi"; // no longer a "skip" — the step is done
+    if (closeBtn) closeBtn.textContent = "Close"; // no longer a "skip" — the step is done
   };
 
   if (submitBtn) submitBtn.onclick = send;
@@ -239,8 +239,8 @@ export function openLeaderboardReadOnly() {
   offset = 0;
   if (form) form.hidden = true;
   if (invite) invite.hidden = true;
-  if (closeBtn) closeBtn.textContent = "Chiudi";
-  if (statusEl) statusEl.textContent = "Caricamento…";
+  if (closeBtn) closeBtn.textContent = "Close";
+  if (statusEl) statusEl.textContent = "Loading…";
   if (listEl) listEl.innerHTML = "";
   if (pager) pager.hidden = true;
   wireChrome(null);

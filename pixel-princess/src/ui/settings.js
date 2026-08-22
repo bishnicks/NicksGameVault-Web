@@ -45,12 +45,12 @@ export function showSettings(onClose) {
   // then re-reads the cleared storage so every scene reflects the fresh start.
   if (resetBtn) {
     resetArmed = false;
-    resetBtn.textContent = "Cancella i progressi";
+    resetBtn.textContent = "Erase progress";
     resetBtn.classList.remove("danger-armed");
     resetBtn.onclick = () => {
       if (!resetArmed) {
         resetArmed = true;
-        resetBtn.textContent = "Sei sicura? Tocca ancora";
+        resetBtn.textContent = "Are you sure? Tap again";
         resetBtn.classList.add("danger-armed");
         sfx("select");
         return;

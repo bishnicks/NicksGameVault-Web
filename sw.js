@@ -1,4 +1,4 @@
-const CACHE='nicks-game-vault-v18';
+const CACHE='nicks-game-vault-v19';
 const CORE=['./arcade-launcher.html','./neon-creek-dash.html','./star-swarm.html','./wildscale.html','./hummingbird-haven.html','./cosmos-wars/index.html','./maze-game/index.html','./neon-pong/index.html','./pixel-princess/index.html','./Starry-icon.png'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
