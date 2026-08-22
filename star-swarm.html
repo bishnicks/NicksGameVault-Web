@@ -38,14 +38,14 @@
   <header><div class="brand"><img class="app-icon" src="Starry-icon.png" alt=""><div><p class="eyebrow">Cosmic arcade</p><h1>Starry</h1></div></div><div class="hud"><span>SCORE <b id="score">000000</b></span><span>BEST <b id="best">000000</b></span><span>WAVE <b id="wave">01</b></span><span>ENEMIES <b id="enemy-type">FIREFLY SWARM</b></span><span>HULL <b id="lives">◆◆◆</b></span><span>COMPANION <b id="ally-type">DRAGON</b></span></div></header>
   <div class="game-stage"><canvas id="game" width="840" height="620" aria-label="Starry arcade game. Move with arrows or WASD and fire with Space."></canvas></div>
   <div class="touch-controls" aria-label="Touch game controls"><div class="touch-stick"><button data-key="ArrowUp" aria-label="Move up">▲</button><button data-key="ArrowLeft" aria-label="Move left">◀</button><button data-key="ArrowDown" aria-label="Move down">▼</button><button data-key="ArrowRight" aria-label="Move right">▶</button></div><button class="fire-button" data-key=" " aria-label="Fire">FIRE</button></div>
-  <div class="character-picker" aria-label="Choose your character"><span>CHOOSE YOUR TRAVELER</span><button class="character-choice selected" data-character="fire" type="button">Fire Dragon</button><button class="character-choice" data-character="sky" type="button">Blue Dragon</button><button class="character-choice" data-character="pegasus" type="button">Sky Pegasus</button><button class="character-choice" data-character="dog" type="button">Cosmic Dog</button><button class="character-choice" data-character="angler" type="button">Braxton Starshot</button><button class="character-choice" data-character="captain" type="button">Red Star Pilot</button><button class="character-choice" data-character="traveler" type="button">Jackie Starbound</button></div>
+  <div class="character-picker" aria-label="Choose your character"><span>CHOOSE YOUR TRAVELER</span><button class="character-choice selected" data-character="fire" type="button">Fire Dragon</button><button class="character-choice" data-character="sky" type="button">Blue Dragon</button><button class="character-choice" data-character="pegasus" type="button">Sky Pegasus</button><button class="character-choice" data-character="dog" type="button">Cosmic Dog</button><button class="character-choice" data-character="angler" type="button">Braxton Starshot</button><button class="character-choice" data-character="captain" type="button">Red Star Pilot</button><button class="character-choice" data-character="traveler" type="button">Jackie Starbound</button><button class="character-choice" data-character="flower" type="button">Flower Girl</button></div>
   <div class="controls"><div class="buttons"><button id="arcade-home" type="button">Game Hub</button><button id="launch" type="button">Begin Journey</button><button id="sound" type="button">Sound + music: on</button></div><div id="status" role="status">Arrow keys / WASD to steer · Space to fire · P to pause · Esc for Game Hub</div><div class="hint">Power-ups: rapid fire · spread shot · shield</div></div>
 </main>
 <script>
 (() => {
   const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
   const scoreEl=document.getElementById('score'),bestEl=document.getElementById('best'),waveEl=document.getElementById('wave'),livesEl=document.getElementById('lives'),enemyTypeEl=document.getElementById('enemy-type'),allyTypeEl=document.getElementById('ally-type'),statusEl=document.getElementById('status'),arcadeHomeBtn=document.getElementById('arcade-home'),launchBtn=document.getElementById('launch'),soundBtn=document.getElementById('sound'),characterButtons=[...document.querySelectorAll('.character-choice')];
-  const W=840,H=620, keys=new Set(),dragonSprite=new Image(),horseSprite=new Image(),bossSprite=new Image(),captainSprite=new Image(),playerDragonSprite=new Image(),dogSprite=new Image(),anglerSprite=new Image(),redPilotSprite=new Image(),cafeTravelerSprite=new Image(),selectorBackground=new Image();
+  const W=840,H=620, keys=new Set(),dragonSprite=new Image(),horseSprite=new Image(),bossSprite=new Image(),captainSprite=new Image(),playerDragonSprite=new Image(),dogSprite=new Image(),anglerSprite=new Image(),redPilotSprite=new Image(),cafeTravelerSprite=new Image(),flowerGirlSprite=new Image(),selectorBackground=new Image();
   dragonSprite.src='wingman-dragon.png';
   horseSprite.src='horse-sidekick.png';
   bossSprite.src='void-kraken-overlord.png';
@@ -55,16 +55,17 @@
   anglerSprite.src='cosmic-angler.png';
   redPilotSprite.src='red-star-pilot.png';
   cafeTravelerSprite.src='star-cafe-traveler.png';
+  flowerGirlSprite.src='flower-girl.png';
   selectorBackground.src='selector-atmosphere.png';
   let state='title',score=0,best=0,wave=1,lives=3,player,dragon,bullets=[],enemyBullets=[],enemies=[],powerups=[],particles=[],stars=[],formation,boss=null,waveTimer=0,last=0,shake=0,muted=false,audio=null,shotTimer=0,enemyFireTimer=0,musicTimer=0,musicStep=0,selectedCharacter='fire';
   try { best=Number(localStorage.getItem('starSwarmBest')||0); } catch (_) {}
-  try { const savedCharacter=localStorage.getItem('starSwarmCharacter');if(['fire','sky','pegasus','dog','angler','captain','traveler'].includes(savedCharacter))selectedCharacter=savedCharacter; } catch (_) {}
+  try { const savedCharacter=localStorage.getItem('starSwarmCharacter');if(['fire','sky','pegasus','dog','angler','captain','traveler','flower'].includes(savedCharacter))selectedCharacter=savedCharacter; } catch (_) {}
   const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
   const rand=(a,b)=>a+Math.random()*(b-a);
   const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
   function initStars(){stars=Array.from({length:155},()=>({x:Math.random()*W,y:Math.random()*H,z:rand(.2,1.6),h:Math.random()>.86?rand(185,280):rand(185,225)}));}
   function updateCharacterPicker(){characterButtons.forEach(button=>button.classList.toggle('selected',button.dataset.character===selectedCharacter));}
-  function characterName(character){return {fire:'Fire Dragon',sky:'Blue Dragon',pegasus:'Sky Pegasus',dog:'Cosmic Dog',angler:'Braxton Starshot',captain:'Red Star Pilot',traveler:'Jackie Starbound'}[character]||'Fire Dragon';}
+  function characterName(character){return {fire:'Fire Dragon',sky:'Blue Dragon',pegasus:'Sky Pegasus',dog:'Cosmic Dog',angler:'Braxton Starshot',captain:'Red Star Pilot',traveler:'Jackie Starbound',flower:'Flower Girl'}[character]||'Fire Dragon';}
   function selectCharacter(character){selectedCharacter=character;try{localStorage.setItem('starSwarmCharacter',character)}catch(_){}updateCharacterPicker();if(state==='playing')statusEl.textContent=`${characterName(character)} selected`;}
   function sound(freq=.1,dur=.07,type='sine',vol=.025,slide=0){ if(muted)return; try{audio ||= new (window.AudioContext||window.webkitAudioContext)(); const o=audio.createOscillator(),g=audio.createGain();o.type=type;o.frequency.setValueAtTime(freq,audio.currentTime);o.frequency.linearRampToValueAtTime(Math.max(20,freq+slide),audio.currentTime+dur);g.gain.setValueAtTime(vol,audio.currentTime);g.gain.exponentialRampToValueAtTime(.0001,audio.currentTime+dur);o.connect(g).connect(audio.destination);o.start();o.stop(audio.currentTime+dur);}catch(_){}}
   function musicBeat(){const melody=[440,523,622,659,622,523,466,0,440,554,659,740,659,554,494,0,415,494,587,698,587,494,440,0,466,554,659,784,740,622,523,0],bass=[55,62,73,65,55,69,62,49];const note=melody[musicStep%melody.length];if(note){sound(note,.17,'sine',.018,18);sound(note*1.5,.10,'triangle',.006,-8);}if(musicStep%4===0)sound(bass[Math.floor(musicStep/4)%bass.length],.28,'triangle',.020,4);musicStep++;}
@@ -159,7 +160,8 @@
   function drawStars(){ctx.fillStyle='#030719';ctx.fillRect(0,0,W,H);for(const s of stars){ctx.fillStyle=`hsla(${s.h},95%,${55+s.z*22}%,${.32+s.z*.3})`;ctx.fillRect(s.x,s.y,s.z,s.z);}}
   function drawShip(x,y,scale=1,hit=false){
     ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);if(hit&&Math.floor(performance.now()/80)%2===0){ctx.globalAlpha=.35;}
-    if(selectedCharacter==='captain'&&redPilotSprite.complete&&redPilotSprite.naturalWidth){glow('#ffbe63',18);ctx.drawImage(redPilotSprite,-24,-36,48,72);}
+    if(selectedCharacter==='flower'&&flowerGirlSprite.complete&&flowerGirlSprite.naturalWidth){glow('#fff1bd',18);ctx.drawImage(flowerGirlSprite,-15,-45,30,91);}
+    else if(selectedCharacter==='captain'&&redPilotSprite.complete&&redPilotSprite.naturalWidth){glow('#ffbe63',18);ctx.drawImage(redPilotSprite,-24,-36,48,72);}
     else if(selectedCharacter==='traveler'&&cafeTravelerSprite.complete&&cafeTravelerSprite.naturalWidth){glow('#68e9ff',18);ctx.drawImage(cafeTravelerSprite,-23,-35,46,69);}
     else if(selectedCharacter==='dog'&&dogSprite.complete&&dogSprite.naturalWidth){glow('#52e6ff',22);ctx.drawImage(dogSprite,-50,-62,100,124);}
     else if(selectedCharacter==='angler'&&anglerSprite.complete&&anglerSprite.naturalWidth){glow('#72cfff',18);ctx.drawImage(anglerSprite,-35,-44,70,88);ctx.save();ctx.beginPath();ctx.arc(0,-29,19,0,Math.PI*2);ctx.clip();glow('#72cfff',14);ctx.drawImage(anglerSprite,530,20,210,225,-22,-52,44,47);ctx.restore();ctx.strokeStyle='#9eefff';ctx.lineWidth=1.4;glow('#72cfff',10);ctx.beginPath();ctx.arc(0,-29,19,0,Math.PI*2);ctx.stroke();}
