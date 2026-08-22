@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Play Tetris — stack and clear lines with falling tetrominoes! Part of GameBox.">
+    <meta name="theme-color" content="#0f1117">
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="common.css">
+    <link rel="stylesheet" href="style.css">
+    <title>Tetris — GameBox</title>
+</head>
+<body>
+    <a href="#game" class="skip-link">Skip to game</a>
+    <a href="../arcade-launcher.html" class="back-link" aria-label="Back to Nick's Game Vault">← Game Hub</a>
+    <div class="game-shell tetris-shell" id="game">
+        <h1>Tetris</h1>
+        <div class="tetris-layout">
+            <canvas id="canvas" width="240" height="480"></canvas>
+            <div class="tetris-sidebar">
+                <div class="tetris-info"><span class="info-label">Score</span><span class="info-value" id="score">0</span></div>
+                <div class="tetris-info"><span class="info-label">Level</span><span class="info-value" id="level">1</span></div>
+                <div class="tetris-info"><span class="info-label">Lines</span><span class="info-value" id="lines">0</span></div>
+                <div class="tetris-info"><span class="info-label">Best</span><span class="info-value" id="best">0</span></div>
+                <p class="next-label">Next</p>
+                <canvas id="next-canvas" width="96" height="96"></canvas>
+            </div>
+        </div>
+        <p class="control-hint">Use the buttons to move, rotate, and drop</p>
+        <div class="touch-controls" aria-label="Tetris controls"><button type="button" data-action="left" aria-label="Move left">◀</button><button type="button" data-action="rotate" aria-label="Rotate">↻</button><button type="button" data-action="right" aria-label="Move right">▶</button><button type="button" data-action="down" aria-label="Move down">▼</button><button type="button" data-action="drop" aria-label="Drop">DROP</button></div>
+        <button class="gb-btn gb-btn-solid" id="start-btn">Start</button>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
