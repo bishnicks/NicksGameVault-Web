@@ -1,0 +1,4 @@
+APEX FORMULA 2026
+Source: https://github.com/ahacker-1/apex-formula-2026
+License: Apache License 2.0 (see LICENSE)
+Third-party notices are preserved in LICENSES and THIRD_PARTY_NOTICES.md.
