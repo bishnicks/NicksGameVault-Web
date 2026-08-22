@@ -1,0 +1,14 @@
+{
+  "name": "Nick's Game Vault",
+  "short_name": "Game Vault",
+  "description": "A collection of touch-friendly arcade games.",
+  "start_url": "./arcade-launcher.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#060817",
+  "theme_color": "#10231f",
+  "icons": [
+    {"src": "Starry-icon.png", "sizes": "1254x1254", "type": "image/png", "purpose": "any maskable"}
+  ]
+}
