@@ -161,7 +161,11 @@
         animId = requestAnimationFrame(loop);
     }
 
-    canvas.addEventListener('click', flap);
+    canvas.addEventListener('pointerdown', event => {
+        event.preventDefault();
+        flap();
+    }, { passive: false });
+    canvas.addEventListener('touchmove', event => event.preventDefault(), { passive: false });
     document.addEventListener('keydown', e => {
         if (e.key === ' ') { e.preventDefault(); flap(); }
     });
