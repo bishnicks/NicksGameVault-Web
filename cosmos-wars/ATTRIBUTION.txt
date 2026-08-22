@@ -1,0 +1,12 @@
+Cosmos Wars integration
+
+Based on “JavaScript Shooter Game” by Ramin Mammadzada:
+https://github.com/RaminMammadzada/js-shooter-game
+
+The upstream project is distributed under the MIT License. The complete
+license notice is included in LICENSE.txt in this directory.
+
+Nick's Game Vault modifications:
+- Added Game Hub navigation and iPhone safe-area styling.
+- Removed the external leaderboard connection for a self-contained build.
+- Rebuilt the game for static hosting on GitHub Pages.

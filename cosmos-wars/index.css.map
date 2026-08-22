@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../src/styles/style.css"],
+  "sourcesContent": ["body {\n  margin: 0;\n  padding: 0;\n  width: 100%;\n  min-height: 100vh;\n  min-height: 100dvh;\n  background-color: black;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  overflow: hidden;\n  overscroll-behavior: none;\n  touch-action: none;\n  -webkit-user-select: none;\n  user-select: none;\n}\n\ncanvas { display: block; max-width: 100vw; max-height: 100dvh; }\n.hub-link { position: fixed; z-index: 10000; top: max(8px, env(safe-area-inset-top)); left: max(8px, env(safe-area-inset-left)); padding: 9px 12px; border: 1px solid #9eeaff88; border-radius: 10px; background: #071528cc; color: white; font: 700 12px -apple-system, BlinkMacSystemFont, sans-serif; text-decoration: none; backdrop-filter: blur(8px); -webkit-tap-highlight-color: transparent; }\n@media (max-height: 500px) { .hub-link { padding: 6px 9px; font-size: 10px; opacity: .82; } }\n"],
+  "mappings": "AAAA,YACU,EADV,QAEW,EACT,MAAO,KACP,WAAY,MACZ,WAAY,OACZ,iBAAkB,KAClB,QAAS,KACT,gBAAiB,OACjB,YAAa,OACb,SAAU,OACV,oBAAqB,KACrB,aAAc,KACd,oBAAqB,KACrB,YAAa,IACf,CAEA,OAAS,QAAS,MAAO,UAAW,MAAO,WAAY,MAAQ,CAC/D,CAAC,SAAW,SAAU,MAAO,QAAS,MAAO,IAAK,IAAI,GAAG,CAAE,IAAI,sBAAuB,KAAM,IAAI,GAAG,CAAE,IAAI,uBAlBzG,QAkB0I,IAAI,KAAM,OAAQ,IAAI,MAAM,UAlBtK,cAkBgM,KAAM,WAAY,UAAW,MAAO,KAAO,KAAM,IAAI,KAAK,aAAa,CAAE,kBAAkB,CAAE,WAAY,gBAAiB,KAAM,gBAAiB,KAAK,KAAM,4BAA6B,WAAa,CACtY,OAAO,WAAa,OAAS,CAD5B,SAlBD,QAmBkD,IAAI,IAAK,UAAW,KAAM,QAAS,GAAK,CAAE",
+  "names": []
+}
