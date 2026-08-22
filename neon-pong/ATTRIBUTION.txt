@@ -1,0 +1,2 @@
+Neon Pong is adapted from https://github.com/knotasu/ping-pong
+Original project by knotasu, used under the MIT License.
