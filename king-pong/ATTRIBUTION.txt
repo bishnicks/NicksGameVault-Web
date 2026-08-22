@@ -1,0 +1,6 @@
+King Pong
+
+Source: https://github.com/KingAlexGilbert/king-pong
+License: GNU General Public License v3.0 (see LICENSE)
+
+The game and its included assets remain available under their respective licenses.

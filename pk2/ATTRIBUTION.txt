@@ -1,0 +1,7 @@
+Pekka Kana 2 (PK2)
+
+Source: https://github.com/GMH-Code/PK2
+Browser build: https://pk2.m-h.org.uk/
+License: MIT (see LICENSE.txt)
+
+The original browser build files are included so the game can run directly from Nick's Game Vault.
