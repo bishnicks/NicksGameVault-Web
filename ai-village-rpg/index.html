@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI Village RPG</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>#vaultHome{position:fixed;z-index:10000;left:max(10px,env(safe-area-inset-left));top:max(10px,env(safe-area-inset-top));padding:9px 13px;border:1px solid #ffffff55;border-radius:999px;background:#171a2bdd;color:#fff;font:700 12px/1 system-ui,sans-serif;text-decoration:none}</style>
+  </head>
+  <body>
+    <a id="vaultHome" href="../arcade-launcher.html">Game Hub</a>
+    <header class="header">
+      <h1>AI Village RPG</h1>
+      <div class="sub">Turn-based prototype (no build step)</div>
+    </header>
+
+    <main class="app">
+      <section class="panel" id="hud"></section>
+      <section class="panel" id="actions"></section>
+      <section class="panel" id="log"></section>
+    </main>
+
+    <footer class="footer">
+      <span>Local save uses your browser storage.</span>
+    </footer>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
