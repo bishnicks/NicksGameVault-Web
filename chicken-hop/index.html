@@ -1,0 +1,57 @@
+﻿<!--(C) 2020 Moses Odhiambo-->
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="zid.png" />
+    <meta name="theme-color" content="#0e9fc2" /><meta name="apple-mobile-web-app-capable" content="yes" /><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>ChickenHop</title>
+    <link href="index.css" rel="stylesheet" type="text/css" />
+    <script src="lib/112.1/three.min.js"></script>
+    <script src="lib/112.1/GLTFLoader.min.js"></script>
+    <script src="lib/112.1/OrbitControls.min.js"></script>
+    <script src="lib/112.1/BufferGeometryUtils.min.js"></script>
+    <script src="lib/stats/stats.min.js"></script>
+    <script src="lib/sweetalert/sweetalert.min.js"></script>
+  </head>
+  <body onload="firstRun()">
+    <a id="vaultHome" href="../arcade-launcher.html">Game Hub</a>
+    <div id="score"></div>
+    <button id="pauseButton" onclick="pauseGame()" style="display: none">
+      PAUSE
+    </button>
+
+    <div id="pauseMenu" style="display: none">
+      <div id="pauseMenuContent">
+        <h1>PAUSED</h1>
+        <div id="currentScore">Current Score: 0</div>
+        <div id="highScore">High Score: 0</div>
+        <button id="resumeButton" onclick="resumeGame()">RESUME</button>
+        <button id="homeButton" onclick="goHome()">HOME</button>
+      </div>
+    </div>
+
+    <div id="splash">
+      <div id="title">CHICKENHOP<br />BY ZIDAN ANANTA.<br />ENJOY!</div>
+      <div id="loading">
+        <div class="main letter">LOADING</div>
+        <div class="period1 letter">.</div>
+        <div class="period2 letter">.</div>
+        <div class="period3 letter">.</div>
+      </div>
+      <div id="instructions">
+        Swipe or use the arrow keys<br />
+        to cross the road
+      </div>
+      <div id="play">
+        PLAY
+        <button id="pressPlay" disabled onclick="init()"></button>
+      </div>
+    </div>
+    <button id="restart" onclick="init()">Play Again</button>
+    <script src="index.js"></script>
+    <script>function goHome(){location.href='../arcade-launcher.html'}addEventListener('keydown',event=>{if(event.key==='Escape')goHome()});</script>
+  </body>
+</html>

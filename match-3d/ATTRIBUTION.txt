@@ -1,0 +1,3 @@
+Match-3D.js by Feco Linhares
+https://github.com/fecolinhares/match-3djs
+Used under the MIT License.

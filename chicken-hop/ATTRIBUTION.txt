@@ -1,0 +1,2 @@
+ChickenHop is adapted from https://github.com/TheCodingRocket/ChickenHop
+Original game by Zidan Ananta, used under the MIT License.

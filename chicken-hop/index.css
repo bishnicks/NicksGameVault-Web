@@ -1,0 +1,228 @@
+﻿/*(C) 2020 Moses Odhiambo*/
+@font-face{
+	font-family: Extrude;
+	src: url(assets/fonts/Extrude.ttf);
+}
+@font-face{
+	font-family: Boxy;
+	src: url(assets/fonts/PressStart2P.ttf);
+}
+*{
+	padding: 0;
+	margin: 0;
+	user-select:none;
+}
+*:focus {
+    outline: none;
+}
+body{
+	margin: 0;
+	overflow: hidden;
+}
+#vaultHome{position:fixed;z-index:300;left:calc(10px + env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));padding:11px 14px;border:2px solid #fff;border-radius:10px;background:#0e9fc2dd;color:#fff;font-family:Boxy,sans-serif;font-size:11px;text-decoration:none;box-shadow:0 6px 20px #0008}
+html,body{width:100%;height:100%;touch-action:none;-webkit-user-select:none;user-select:none}
+#splash{height:100dvh}
+@media(max-height:500px){#title{top:4vh;font-size:28px;line-height:8vh}#instructions{top:66vh}#play{top:72vh}#loading{top:82vh}}
+canvas{
+    height: 100%;
+    width: 100%;
+	display: block;
+}
+#score {
+	font-family: Boxy;
+	font-size: 18px;
+	color: white;
+	position: absolute;
+	top: 20px;
+	right: 20px;
+}
+#splash{
+	height: 100vh;
+	width: 100vw;
+	background-image: url('assets/images/splash-screen.jpg');
+	background-size: auto 100%;
+	background-position: center center;
+}
+#title{
+	position: absolute;
+	height: 18vh;
+	width: 100vw;
+	top: 8vh;
+	font-family: Extrude;
+	font-size: 40px;
+	color: white;
+	text-align: center;
+	vertical-align: middle;
+	line-height: 6vh;
+}
+#loading{
+	opacity: 1;
+	position: relative;
+	top: 85vh;
+	width: 240px;
+	height: 5%;
+	margin: 0 auto;
+	font-family: Boxy;
+	font-size: 24px;
+	background-color: white;
+}
+.letter{
+	height: 80%;
+	float: left;
+	color: #11bfe2;
+}
+.main{
+	height: 80%;
+	margin: 5px 0px;
+}
+.period1{
+	animation: first 3s step-end infinite;
+}
+.period2{
+	animation: second 3s step-end infinite;
+}
+.period3{
+	animation: third 3s step-end infinite;
+}
+#instructions{
+	position: absolute;
+	top: 75vh;
+	width: 100%;
+	height: 5%;
+	margin: 0 auto;
+	font-family: 'Roboto';
+	font-size: 18px;
+	text-align: center;
+	color: white;
+}
+#play{
+	opacity: 0;
+	position: relative;
+	top: 80vh;
+	width: 200px;
+	height: 5%;
+	margin: 0 auto;
+	font-family: 'Press Start 2p';
+	font-size: 24px;
+	text-align: center;
+	color: #11bfe2;
+	background-color: white;
+}
+#pressPlay{
+	opacity: 0;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 200px;
+	height: 100%;
+}
+#restart {
+	position: absolute;
+	top: 50vh;
+	left: 50vw;
+	background-color: red;
+	color: white;
+	padding: 15px 30px 15px 30px;
+	font-family: Boxy;
+	font-size: 20px;
+	border-style: none;
+	transform: translate(-50%, -50%);
+	visibility: hidden;
+}
+@keyframes first{
+	0% { opacity: 0; }
+	25% { opacity: 1; }
+	50% { opacity: 1; }
+	75% { opacity: 1; }
+}
+@keyframes second{
+	0% { opacity: 0; }
+	25% { opacity: 0; }
+	50% { opacity: 1; }
+	75% { opacity: 1; }
+}
+@keyframes third{
+	0% { opacity: 0; }
+	25% { opacity: 0; }
+	50% { opacity: 0; }
+	75% { opacity: 1; }
+}
+
+/* Pause Button */
+#pauseButton {
+	position: absolute;
+	top: 20px;
+	left: 20px;
+	padding: 10px 20px;
+	background-color: #11bfe2;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	font-family: Boxy;
+	font-size: 16px;
+	cursor: pointer;
+	z-index: 100;
+	transition: background-color 0.3s ease;
+}
+
+#pauseButton:hover {
+	background-color: #0fa5c8;
+}
+
+/* Pause Menu Overlay */
+#pauseMenu {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background-color: rgba(0, 0, 0, 0.8);
+	display: none;
+	justify-content: center;
+	align-items: center;
+	z-index: 200;
+}
+
+#pauseMenuContent {
+	background-color: #1a1a1a;
+	padding: 40px;
+	border-radius: 10px;
+	text-align: center;
+	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+	border: 4px solid #11bfe2;
+}
+
+#pauseMenuContent h1 {
+	font-family: Boxy;
+	font-size: 48px;
+	color: #11bfe2;
+	margin-bottom: 30px;
+	text-transform: uppercase;
+}
+
+#currentScore, #highScore {
+	font-family: Boxy;
+	font-size: 24px;
+	color: white;
+	margin: 15px 0;
+}
+
+#pauseMenuContent button {
+	display: block;
+	width: 100%;
+	padding: 15px 20px;
+	margin-top: 20px;
+	background-color: #11bfe2;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	font-family: Boxy;
+	font-size: 20px;
+	cursor: pointer;
+	transition: background-color 0.3s ease;
+	text-transform: uppercase;
+}
+
+#pauseMenuContent button:hover {
+	background-color: #0fa5c8;
+}

@@ -1,0 +1,5 @@
+Aetherfall: Shadow Catacombs is a playable adaptation of the design published by Yoi-Nakama:
+https://github.com/Yoi-Nakama/aetherfall-dungeon-rampage
+
+The upstream repository contains design documentation rather than playable source code.
+This implementation was created for Nick's Game Vault and follows that MIT-licensed design.
