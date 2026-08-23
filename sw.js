@@ -1,4 +1,4 @@
-const CACHE='nicks-game-vault-v26';
+const CACHE='nicks-game-vault-v27';
 const CORE=['./arcade-launcher.html','./neon-creek-dash.html','./star-swarm.html','./wildscale.html','./hummingbird-haven.html','./cosmos-wars/index.html','./maze-game/index.html','./neon-pong/index.html','./pixel-princess/index.html','./chicken-hop/index.html','./aetherfall/index.html','./match-3d/index.html','./game-2048/index.html','./veilspire/index.html','./pk2/index.html','./king-pong/index.html','./apex-formula-2026/index.html','./ai-village-rpg/index.html','./princejs/index.html','./gamebox-tetris/index.html','./gamebox-flappy-bird/index.html','./Starry-icon.png'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
