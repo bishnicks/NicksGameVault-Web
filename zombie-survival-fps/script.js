@@ -17,6 +17,7 @@ let prevTime = performance.now();
 
 // Zombie system
 let zombies = [];
+let tigerBuddy = null;
 let zombieModel = null;
 let loader = new THREE.GLTFLoader();
 const ZOMBIE_COUNT = 10;
@@ -413,6 +414,9 @@ function init() {
 
   // Load zombie model and start wave system
   loadZombieModel();
+
+  // Add Frost, the friendly white tiger.
+  spawnTigerBuddy();
 
   // Add event listeners
   addEventListeners();
@@ -1549,6 +1553,102 @@ function createZombieModel(zombieType) {
   zombieGroup.userData.zombieType = zombieType;
 
   return zombieGroup;
+}
+
+// Frost, the player's friendly low-poly white tiger companion.
+function createWhiteTigerBuddy() {
+  const tiger = new THREE.Group();
+  const white = new THREE.MeshLambertMaterial({ color: 0xf2f4f7 });
+  const silver = new THREE.MeshLambertMaterial({ color: 0xd8e0e7 });
+  const black = new THREE.MeshLambertMaterial({ color: 0x111820 });
+  const cyan = new THREE.MeshBasicMaterial({ color: 0x71efff });
+  const box = (w, h, d, material, x, y, z) => {
+    const part = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
+    part.position.set(x, y, z);
+    tiger.add(part);
+    return part;
+  };
+
+  box(1.7, 0.78, 0.72, white, 0, 0.88, 0);
+  box(0.78, 0.7, 0.72, white, 0, 1.18, 0.9);
+  box(0.5, 0.28, 0.36, silver, 0, 1.02, 1.34);
+  box(0.18, 0.13, 0.1, black, 0, 1.1, 1.57);
+
+  [-1, 1].forEach((side) => {
+    const ear = new THREE.Mesh(new THREE.ConeGeometry(0.22, 0.4, 4), black);
+    ear.position.set(side * 0.28, 1.62, 0.92);
+    ear.rotation.y = Math.PI / 4;
+    tiger.add(ear);
+    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.075, 8, 8), cyan);
+    eye.position.set(side * 0.23, 1.28, 1.28);
+    tiger.add(eye);
+    box(0.3, 0.76, 0.3, white, side * 0.55, 0.38, 0.48);
+    box(0.3, 0.76, 0.3, white, side * 0.55, 0.38, -0.5);
+  });
+
+  [-0.55, -0.15, 0.25, 0.62].forEach((z, index) => {
+    const stripe = box(1.74, 0.12, 0.1, black, 0, 1.2 - (index % 2) * 0.12, z);
+    stripe.rotation.z = index % 2 ? 0.16 : -0.16;
+  });
+
+  const tail = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.13, 1.55, 8), white);
+  tail.position.set(0, 1.12, -1.12);
+  tail.rotation.x = Math.PI / 2.7;
+  tiger.add(tail);
+  const aura = new THREE.Mesh(
+    new THREE.RingGeometry(1.05, 1.22, 32),
+    new THREE.MeshBasicMaterial({ color: 0x65eaff, transparent: true, opacity: 0.38, side: THREE.DoubleSide })
+  );
+  aura.rotation.x = -Math.PI / 2;
+  aura.position.y = 0.04;
+  tiger.add(aura);
+  tiger.scale.setScalar(0.85);
+  tiger.userData = { attackCooldown: 0, aura, stride: 0 };
+  tiger.traverse((child) => { if (child.isMesh && child !== aura) child.castShadow = true; });
+  return tiger;
+}
+
+function spawnTigerBuddy() {
+  if (tigerBuddy || !scene || !controls) return;
+  tigerBuddy = createWhiteTigerBuddy();
+  const player = controls.getObject().position;
+  tigerBuddy.position.set(player.x - 3, 0, player.z + 3);
+  scene.add(tigerBuddy);
+}
+
+function updateTigerBuddy(delta) {
+  if (!tigerBuddy || !controls) return;
+  const player = controls.getObject().position;
+  let target = null;
+  let targetDistance = 14;
+  zombies.forEach((zombie) => {
+    if (!zombie || !zombie.userData || zombie.userData.isDead || zombie.userData.isFalling) return;
+    const distance = tigerBuddy.position.distanceTo(zombie.position);
+    if (distance < targetDistance) { target = zombie; targetDistance = distance; }
+  });
+
+  const destination = target
+    ? target.position.clone()
+    : new THREE.Vector3(player.x - 2.6, 0, player.z + 3.2);
+  const path = destination.sub(tigerBuddy.position);
+  path.y = 0;
+  const distance = path.length();
+  if (distance > (target ? 1.65 : 1.2)) {
+    path.normalize();
+    tigerBuddy.position.addScaledVector(path, Math.min(distance, (target ? 6.2 : 5) * delta));
+    tigerBuddy.rotation.y = Math.atan2(path.x, path.z);
+    tigerBuddy.userData.stride += delta * 9;
+    tigerBuddy.position.y = Math.abs(Math.sin(tigerBuddy.userData.stride)) * 0.1;
+  } else tigerBuddy.position.y *= 0.8;
+
+  tigerBuddy.userData.attackCooldown = Math.max(0, tigerBuddy.userData.attackCooldown - delta);
+  if (target && targetDistance < 2.1 && tigerBuddy.userData.attackCooldown === 0) {
+    const zombieIndex = zombies.indexOf(target);
+    if (zombieIndex !== -1) hitZombie(target, zombieIndex);
+    tigerBuddy.userData.attackCooldown = 0.8;
+    tigerBuddy.scale.set(1.02, 0.78, 1.08);
+  } else tigerBuddy.scale.lerp(new THREE.Vector3(0.85, 0.85, 0.85), 0.14);
+  tigerBuddy.userData.aura.material.opacity = 0.28 + Math.sin(performance.now() * 0.004) * 0.1;
 }
 
 // Create placeholder zombie models for all types
@@ -4057,6 +4157,15 @@ function createZombieAttackEffect(position) {
 function initializeUI() {
   console.log("Initializing UI elements...");
 
+  const infoDiv = document.querySelector(".info");
+  if (infoDiv && !document.getElementById("buddyInfo")) {
+    const buddyInfo = document.createElement("div");
+    buddyInfo.id = "buddyInfo";
+    buddyInfo.textContent = "🐅 Buddy: Frost · White Tiger";
+    buddyInfo.style.color = "#8ff5ff";
+    infoDiv.appendChild(buddyInfo);
+  }
+
   // Initialize health bar
   updateHealthBar();
 
@@ -4195,10 +4304,11 @@ function animate() {
   }
 
   const time = performance.now();
+  const frameDelta = Math.min((time - prevTime) / 1000, 0.05);
 
   // Only handle movement when game is playing
   if (gameState === "playing" && (controls.isLocked === true || isTouchDevice)) {
-    const delta = (time - prevTime) / 1000;
+    const delta = frameDelta;
 
     velocity.x -= velocity.x * 10.0 * delta;
     velocity.z -= velocity.z * 10.0 * delta;
@@ -4244,6 +4354,9 @@ function animate() {
   if (gameState === "playing" && !isGameOver) {
     // Update zombie behavior
     updateZombies();
+
+    // Frost follows the player and attacks nearby zombies.
+    updateTigerBuddy(frameDelta);
 
     // Check if wave is complete
     checkWaveComplete();
