@@ -213,12 +213,38 @@ class Chicken{
         this.model.rotation.y += Math.PI;
         if(selectedCharacter === 'adventure-girl'){
             while(this.model.children.length) this.model.remove(this.model.children[0]);
+            const hair = new THREE.MeshLambertMaterial({color: 0xe6a928});
+            const shirt = new THREE.MeshLambertMaterial({color: 0x2f9c48});
+            const pants = new THREE.MeshLambertMaterial({color: 0x171717});
+            const backpack = new THREE.MeshLambertMaterial({color: 0x243c68});
+            const depthPieces = [
+                new THREE.Mesh(new THREE.SphereBufferGeometry(0.52, 16, 12), hair),
+                new THREE.Mesh(new THREE.BoxBufferGeometry(0.92, 0.95, 0.48), shirt),
+                new THREE.Mesh(new THREE.BoxBufferGeometry(0.32, 1.12, 0.38), pants),
+                new THREE.Mesh(new THREE.BoxBufferGeometry(0.32, 1.12, 0.38), pants),
+                new THREE.Mesh(new THREE.BoxBufferGeometry(0.7, 1.0, 0.42), backpack)
+            ];
+            depthPieces[0].position.set(0, 2.42, 0.72);
+            depthPieces[1].position.set(0, 1.55, 0.62);
+            depthPieces[2].position.set(-0.28, 0.62, 0.58);
+            depthPieces[3].position.set(0.28, 0.62, 0.58);
+            depthPieces[4].position.set(-0.43, 1.52, 0.82);
+            depthPieces.forEach(piece => this.model.add(piece));
+            const shadow = new THREE.Mesh(
+                new THREE.CircleBufferGeometry(0.8, 24),
+                new THREE.MeshBasicMaterial({color: 0x000000, transparent: true, opacity: 0.22, depthWrite: false})
+            );
+            shadow.rotation.x = -Math.PI / 2;
+            shadow.scale.y = 0.48;
+            shadow.position.set(0, 0.02, 0.04);
+            this.model.add(shadow);
             const girlTexture = new THREE.TextureLoader().load('assets/images/adventure-girl.png');
             girlTexture.minFilter = THREE.LinearFilter;
-            const girlMaterial = new THREE.SpriteMaterial({map: girlTexture, transparent: true, alphaTest: 0.08});
+            const girlMaterial = new THREE.SpriteMaterial({map: girlTexture, transparent: true, alphaTest: 0.08, depthTest: false, depthWrite: false});
             const girlSprite = new THREE.Sprite(girlMaterial);
-            girlSprite.scale.set(2.35, 3.2, 1);
-            girlSprite.position.y = 1.55;
+            girlSprite.scale.set(2.2, 3.05, 1);
+            girlSprite.position.set(0, 1.52, -0.22);
+            girlSprite.renderOrder = 2;
             this.model.add(girlSprite);
         }
         if(columns%2 == 0)
