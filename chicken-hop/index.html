@@ -17,7 +17,7 @@
     <script src="lib/sweetalert/sweetalert.min.js"></script>
   </head>
   <body onload="firstRun()">
-    <a id="vaultHome" href="../arcade-launcher.html">Game Hub</a>
+    <a id="vaultHome" href="../arcade-launcher.html?v=39">Game Hub</a>
     <div id="score"></div>
     <button id="pauseButton" onclick="pauseGame()" style="display: none">
       PAUSE
@@ -45,6 +45,11 @@
         Swipe or use the arrow keys<br />
         to cross the road
       </div>
+      <div id="characterPicker" aria-label="Choose your character">
+        <div class="pickerTitle">CHOOSE YOUR JUMPER</div>
+        <button class="characterChoice selected" data-character="chicken" onclick="chooseCharacter('chicken', this)">CHICKEN</button>
+        <button class="characterChoice" data-character="adventure-girl" onclick="chooseCharacter('adventure-girl', this)">ADVENTURE GIRL</button>
+      </div>
       <div id="play">
         PLAY
         <button id="pressPlay" disabled onclick="init()"></button>
@@ -52,6 +57,5 @@
     </div>
     <button id="restart" onclick="init()">Play Again</button>
     <script src="index.js"></script>
-    <script>function goHome(){location.href='../arcade-launcher.html'}addEventListener('keydown',event=>{if(event.key==='Escape')goHome()});</script>
   </body>
 </html>

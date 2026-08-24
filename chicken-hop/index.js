@@ -13,6 +13,14 @@ let gameSounds, themeSong;
 let gameOver;
 let gamePaused = false;
 let highScore = localStorage.getItem('chickenHopHighScore') || 0;
+let selectedCharacter = localStorage.getItem('chickenJumpCharacter') || 'chicken';
+
+const chooseCharacter = (character, button) => {
+    selectedCharacter = character;
+    localStorage.setItem('chickenJumpCharacter', character);
+    document.querySelectorAll('.characterChoice').forEach(choice => choice.classList.remove('selected'));
+    if(button) button.classList.add('selected');
+}
 
 const firstRun = () =>{
     document.getElementById("instructions").innerText = ((/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) ? "Swipe in the direction you wanna move." : "Use the arrow keys to move around.") + "\nCross as many roads as possible";
@@ -41,6 +49,8 @@ const firstRun = () =>{
 
     update();
     gameSounds = new Sound(camera);
+    const savedChoice = document.querySelector(`[data-character="${selectedCharacter}"]`);
+    if(savedChoice) chooseCharacter(selectedCharacter, savedChoice);
     
 }
 
@@ -201,6 +211,16 @@ class Chicken{
 
         this.model.scale.set(size.x, size.y, size.z);
         this.model.rotation.y += Math.PI;
+        if(selectedCharacter === 'adventure-girl'){
+            while(this.model.children.length) this.model.remove(this.model.children[0]);
+            const girlTexture = new THREE.TextureLoader().load('assets/images/adventure-girl.png');
+            girlTexture.minFilter = THREE.LinearFilter;
+            const girlMaterial = new THREE.SpriteMaterial({map: girlTexture, transparent: true, alphaTest: 0.08});
+            const girlSprite = new THREE.Sprite(girlMaterial);
+            girlSprite.scale.set(2.35, 3.2, 1);
+            girlSprite.position.y = 1.55;
+            this.model.add(girlSprite);
+        }
         if(columns%2 == 0)
             this.model.position.x += cellWidth/2;
 
@@ -292,7 +312,7 @@ class Chicken{
             anim.clampWhenFinished = true;
             this.isMoving = true;
             anim.play();
-            gameSounds.buck.play();
+            if(selectedCharacter === 'chicken') gameSounds.buck.play();
         }
     }
     
@@ -1288,6 +1308,7 @@ const update = () =>{
 
 //resize
 const onPageResize = () =>{
+    if(!camera || !renderer) return;
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
