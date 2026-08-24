@@ -1,0 +1,70 @@
+{
+  "name": "Kurukshetra FPS",
+  "short_name": "Kurukshetra",
+  "description": "A Mahabharat battlefield first-person shooter. Dinosaurs, aliens and robots clash across Kurukshetra, Mumbai and SVNIT Surat. Keyboard + mouse or touch, six divine astras, wave survival. Installs as a desktop app and plays fully offline.",
+  "id": "/",
+  "start_url": ".",
+  "scope": ".",
+  "lang": "en",
+  "dir": "ltr",
+  "display": "standalone",
+  "display_override": ["fullscreen", "standalone", "minimal-ui"],
+  "orientation": "landscape",
+  "background_color": "#1a0a05",
+  "theme_color": "#1a0a05",
+  "categories": ["games", "entertainment"],
+  "prefer_related_applications": false,
+  "launch_handler": { "client_mode": "focus-existing" },
+  "icons": [
+    { "src": "icons/icon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any" },
+    { "src": "icons/icon-192.png", "type": "image/png", "sizes": "192x192", "purpose": "any" },
+    { "src": "icons/icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "any" },
+    { "src": "icons/icon-512-maskable.png", "type": "image/png", "sizes": "512x512", "purpose": "maskable" }
+  ],
+  "screenshots": [
+    {
+      "src": "icons/screenshot-wide.png",
+      "sizes": "1536x1024",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Battlefield combat — dinosaurs, aliens and robots charge the line"
+    },
+    {
+      "src": "icons/screenshot-narrow.png",
+      "sizes": "1536x1024",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Title screen — begin the battle"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Battle",
+      "short_name": "Battle",
+      "description": "Jump straight into the war on your last-played battlefield",
+      "url": "./?play=1",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Kurukshetra — Dinosaur Yuddha",
+      "short_name": "Kurukshetra",
+      "description": "Fight the forgotten war on the plains of Kurukshetra",
+      "url": "./?map=kurukshetra",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Mumbai — Marine Drive & Taj",
+      "short_name": "Mumbai",
+      "description": "Defend Marine Drive and the Taj",
+      "url": "./?map=mumbai",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "SVNIT Surat — Campus Siege",
+      "short_name": "SVNIT",
+      "description": "Hold the campus at SVNIT Surat",
+      "url": "./?map=svnit",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ]
+}

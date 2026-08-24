@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#1a0a05" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <title>Kurukshetra FPS</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+      :root {
+        --gold: #ffd76b; --gold-soft: #f5d089; --gold-dim: #d4a55a; --gold-faint: #a07b45;
+        --ink: #1a0a05;
+        --line: #b8860b; --line-dim: #6b3a1a;
+        --panel: linear-gradient(150deg, rgba(62,24,13,0.88), rgba(24,9,5,0.92));
+        --panel-solid: linear-gradient(150deg, rgba(62,24,13,0.97), rgba(22,9,5,0.98));
+        --btn: linear-gradient(135deg, #d9a528, #8b6508);
+        --shadow: 0 6px 20px rgba(0,0,0,0.55);
+      }
+
+      html, body {
+        width: 100%; height: 100%; overflow: hidden;
+        background: #1a0a05; color: var(--gold-soft);
+        font-family: 'Georgia', 'Times New Roman', serif;
+        user-select: none; -webkit-user-select: none;
+        touch-action: none; overscroll-behavior: none;
+      }
+      #game-canvas { display: block; width: 100vw; height: 100vh; }
+
+      /* ===================== In-game HUD ===================== */
+      #hud { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
+
+      /* Crisp reticle: faint ring + centre dot + four ticks (with a centre gap). */
+      #crosshair {
+        position: absolute; left: 50%; top: 50%; width: 26px; height: 26px;
+        transform: translate(-50%, -50%);
+        border: 1px solid rgba(255, 215, 130, 0.22); border-radius: 50%;
+        background: radial-gradient(circle, var(--gold) 0 1.3px, transparent 1.7px);
+        box-shadow: 0 0 6px rgba(255, 200, 100, 0.35);
+      }
+      #crosshair::before, #crosshair::after { content: ''; position: absolute; }
+      #crosshair::before {
+        left: 50%; top: 0; width: 2px; height: 100%; transform: translateX(-50%);
+        background: linear-gradient(to bottom, rgba(255,215,130,0.9) 0 26%, transparent 26% 74%, rgba(255,215,130,0.9) 74% 100%);
+      }
+      #crosshair::after {
+        top: 50%; left: 0; height: 2px; width: 100%; transform: translateY(-50%);
+        background: linear-gradient(to right, rgba(255,215,130,0.9) 0 26%, transparent 26% 74%, rgba(255,215,130,0.9) 74% 100%);
+      }
+
+      /* Shared framed-panel look for the HUD readouts. */
+      #stats-panel, #ammo-panel, #health-panel {
+        position: absolute; background: var(--panel);
+        border: 1px solid var(--line); border-radius: 10px;
+        box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 220, 150, 0.08);
+      }
+      #stats-panel { top: 14px; left: 14px; padding: 10px 14px; min-width: 186px; font-size: 13px; letter-spacing: 0.5px; }
+      #stats-panel .row { display: flex; justify-content: space-between; align-items: baseline; padding: 3px 0; }
+      #stats-panel .row + .row { border-top: 1px solid rgba(184, 134, 11, 0.16); }
+      #stats-panel .label { color: var(--gold-dim); text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
+      #stats-panel .value { color: #fff3d0; font-weight: bold; }
+
+      #ammo-panel { bottom: 18px; right: 18px; padding: 8px 18px; font-size: 26px; font-weight: bold; min-width: 96px; text-align: center; }
+      #ammo-panel .ammo-current { color: #fff3d0; text-shadow: 0 0 10px rgba(255, 200, 110, 0.35); }
+      #ammo-panel .ammo-sep { color: var(--line); margin: 0 5px; font-size: 18px; }
+      #ammo-panel .ammo-reserve { color: var(--gold-dim); font-size: 15px; }
+
+      #health-panel { bottom: 18px; left: 18px; padding: 9px 14px; min-width: 210px; }
+      #health-panel .label { color: var(--gold-dim); text-transform: uppercase; letter-spacing: 1px; }
+      #health-panel .value { color: #fff3d0; font-weight: bold; }
+      #health-bar-outer {
+        width: 100%; height: 13px; background: #240a05;
+        border: 1px solid var(--line-dim); border-radius: 7px;
+        overflow: hidden; margin-top: 7px; box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.6);
+      }
+      #health-bar-inner {
+        height: 100%; width: 100%; border-radius: 6px; position: relative;
+        background: linear-gradient(90deg, #c0392b, #e67e22 70%, #f3b95a);
+        box-shadow: 0 0 8px rgba(230, 120, 40, 0.5);
+        transition: width 0.25s ease;
+      }
+      #health-bar-inner::after {
+        content: ''; position: absolute; inset: 0; border-radius: 6px;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+        transform: translateX(-100%); animation: sheen 3.4s ease-in-out infinite;
+      }
+
+      #charge-bar-outer {
+        position: absolute; right: 18px; bottom: 70px; width: 134px; height: 8px;
+        background: rgba(16, 8, 4, 0.6); border: 1px solid var(--line-dim);
+        border-radius: 5px; overflow: hidden;
+      }
+      #charge-bar-inner {
+        height: 100%; width: 0%; border-radius: 4px;
+        background: linear-gradient(90deg, #4aa3ff, #cfeaff);
+        box-shadow: 0 0 10px rgba(120, 200, 255, 0.8);
+        transition: width 0.05s linear;
+      }
+      #fire-mode-label {
+        position: absolute; right: 18px; bottom: 98px;
+        background: var(--panel); border: 1px solid var(--line-dim); border-radius: 6px;
+        padding: 3px 10px; font-size: 12px; color: var(--gold-soft); letter-spacing: 1.5px; font-weight: bold;
+      }
+
+      #message-overlay {
+        position: absolute; left: 50%; top: 28%; transform: translateX(-50%);
+        text-align: center; max-width: 80vw; white-space: pre-line;
+        font-size: clamp(20px, 4vw, 30px); font-weight: bold; line-height: 1.4;
+        color: var(--gold); text-shadow: 0 2px 10px rgba(0,0,0,0.95), 0 0 24px rgba(255,180,80,0.35);
+        opacity: 0; transition: opacity 0.6s ease; pointer-events: none;
+      }
+      #message-overlay.show { opacity: 1; }
+
+      #fps-counter {
+        position: absolute; top: 60px; right: 12px;
+        background: rgba(16, 8, 4, 0.72); border: 1px solid var(--line-dim);
+        border-radius: 6px; padding: 4px 9px;
+        font-size: 12px; color: #9fe07a; font-family: 'Courier New', monospace;
+        display: none; letter-spacing: 0.5px;
+      }
+      #fps-counter.show { display: block; }
+
+      /* ===================== Start screen ===================== */
+      #start-screen {
+        position: fixed; inset: 0; z-index: 100;
+        background:
+          radial-gradient(ellipse at 50% 26%, rgba(122, 54, 22, 0.55) 0%, transparent 60%),
+          radial-gradient(ellipse at center, #3a1810 0%, #0a0303 100%);
+        display: flex; flex-direction: column; justify-content: center; align-items: center;
+        text-align: center; padding: 24px; overflow-y: auto;
+        animation: fadeUp 0.8s ease both;
+      }
+      #start-screen::after {
+        content: ''; position: absolute; inset: 0; pointer-events: none;
+        box-shadow: inset 0 0 220px rgba(0, 0, 0, 0.7);
+        background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.5) 100%);
+      }
+      #start-screen > * { position: relative; z-index: 1; }
+      #start-screen h1 {
+        font-size: clamp(36px, 9vw, 78px); font-weight: bold;
+        letter-spacing: clamp(3px, 1.4vw, 12px); line-height: 1.04; margin-bottom: 6px;
+        background: linear-gradient(180deg, #fff6da 0%, #ffd76b 48%, #c8901c 100%);
+        -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+        color: #ffd76b;
+        animation: titleGlow 4.5s ease-in-out infinite;
+      }
+      #start-screen h2 {
+        font-size: clamp(15px, 3vw, 22px); color: var(--gold-dim); font-style: italic;
+        letter-spacing: 1px; margin-bottom: 22px; padding-bottom: 18px; position: relative;
+      }
+      #start-screen h2::after {
+        content: ''; position: absolute; left: 50%; bottom: 0; transform: translateX(-50%);
+        width: min(220px, 60vw); height: 2px;
+        background: linear-gradient(90deg, transparent, var(--line), var(--gold), var(--line), transparent);
+      }
+      #start-screen p {
+        max-width: 540px; color: var(--gold-faint); margin-bottom: 26px; line-height: 1.7;
+        font-size: clamp(13px, 2.4vw, 16px);
+      }
+
+      /* Battlefield (map) chooser — premium cards (keeps .map-opt / data-map). */
+      #map-select { margin-bottom: 26px; width: 100%; max-width: 560px; }
+      .map-select-label {
+        color: var(--gold-dim); font-size: 12px; letter-spacing: 3px;
+        text-transform: uppercase; margin-bottom: 12px;
+      }
+      .map-select-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+      .map-opt {
+        pointer-events: auto; cursor: pointer; font-family: inherit; position: relative; overflow: hidden;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        flex: 1 1 150px; min-width: 150px; max-width: 180px; min-height: 76px; padding: 14px 16px;
+        background: linear-gradient(150deg, rgba(46, 18, 9, 0.9), rgba(22, 9, 5, 0.92));
+        border: 1px solid var(--line-dim); border-radius: 10px;
+        color: var(--gold-soft); font-size: 17px; font-weight: bold; letter-spacing: 1px;
+        transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+      }
+      .map-opt::before {
+        content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+        background: var(--accent, var(--line)); opacity: 0.45; transition: opacity 0.16s ease;
+      }
+      .map-opt span {
+        font-size: 11px; font-weight: normal; color: var(--gold-faint); margin-top: 4px;
+        letter-spacing: 0.5px; font-style: italic;
+      }
+      .map-opt:hover { transform: translateY(-3px); border-color: var(--accent, var(--line)); box-shadow: 0 8px 22px rgba(0, 0, 0, 0.55); }
+      .map-opt:hover::before { opacity: 1; }
+      .map-opt:active { transform: translateY(-1px) scale(0.99); }
+      .map-opt[data-map="kurukshetra"] { --accent: #ff9a4d; }
+      .map-opt[data-map="mumbai"] { --accent: #4ab6e0; }
+      .map-opt[data-map="svnit"] { --accent: #7fd36a; }
+      .map-opt.active {
+        background: linear-gradient(150deg, rgba(184, 134, 11, 0.92), rgba(120, 80, 5, 0.92));
+        color: #1a0a05; border-color: var(--accent, var(--gold));
+        box-shadow: 0 0 20px var(--accent, var(--gold)), 0 6px 18px rgba(0, 0, 0, 0.5);
+      }
+      .map-opt.active::before { opacity: 1; height: 4px; }
+      .map-opt.active span { color: #3a1c05; }
+
+      #start-btn {
+        pointer-events: auto; position: relative; overflow: hidden;
+        background: var(--btn); color: var(--ink); border: 2px solid var(--gold);
+        padding: 16px 46px; font-size: clamp(17px, 3vw, 21px); font-weight: bold;
+        border-radius: 10px; cursor: pointer; font-family: inherit; letter-spacing: 2px;
+        margin-bottom: 28px;
+        box-shadow: 0 6px 22px rgba(255, 180, 80, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+      }
+      #start-btn::before {
+        content: ''; position: absolute; top: 0; left: -60%; width: 40%; height: 100%;
+        background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+        transform: skewX(-20deg); animation: shine 3.6s ease-in-out infinite;
+      }
+      #start-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(255, 180, 80, 0.45); }
+      #start-btn:active { transform: translateY(0) scale(0.97); }
+      #controls-hint { margin-top: 24px; font-size: 12px; color: #8b6f3a; line-height: 1.9; letter-spacing: 0.5px; }
+
+      /* ===================== Touch controls ===================== */
+      #touch-controls { position: fixed; inset: 0; z-index: 20; pointer-events: none; display: none; }
+      #touch-controls.active { display: block; }
+      #joystick-zone { position: absolute; left: 0; bottom: 0; width: 45vw; height: 50vh; pointer-events: auto; }
+      #joystick-base {
+        position: absolute; left: 80px; bottom: 80px; width: 112px; height: 112px;
+        border: 2px solid rgba(255, 215, 130, 0.4);
+        background: radial-gradient(circle, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.35));
+        border-radius: 50%; transform: translate(-50%, 50%); display: none;
+        box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+      }
+      #joystick-knob {
+        position: absolute; left: 50%; top: 50%; width: 52px; height: 52px;
+        background: radial-gradient(circle at 35% 30%, rgba(255, 235, 180, 0.85), rgba(255, 215, 130, 0.5));
+        border: 2px solid var(--gold); border-radius: 50%; transform: translate(-50%, -50%);
+        box-shadow: 0 0 14px rgba(255, 200, 100, 0.55);
+      }
+      #look-zone { position: absolute; right: 0; top: 0; width: 55vw; height: 70vh; pointer-events: auto; }
+      .touch-btn {
+        position: absolute; pointer-events: auto;
+        background: linear-gradient(140deg, rgba(184, 134, 11, 0.78), rgba(120, 80, 5, 0.78));
+        border: 2px solid var(--gold); color: var(--ink); font-weight: bold; font-family: inherit;
+        border-radius: 50%; user-select: none; letter-spacing: 0.5px;
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+        transition: transform 0.08s ease, filter 0.08s ease;
+      }
+      .touch-btn:active { transform: scale(0.93); filter: brightness(1.2); }
+      #fire-btn { right: 30px; bottom: 130px; width: 92px; height: 92px; font-size: 14px; }
+      #jump-btn { right: 140px; bottom: 60px; width: 70px; height: 70px; font-size: 13px; }
+      #reload-btn { right: 40px; bottom: 30px; width: 70px; height: 70px; font-size: 12px; }
+      #charge-btn {
+        right: 135px; bottom: 150px; width: 68px; height: 68px; font-size: 11px;
+        background: linear-gradient(140deg, rgba(74, 163, 255, 0.78), rgba(20, 80, 150, 0.78));
+        border-color: #cfeaff; color: #06203a;
+      }
+      #mode-btn {
+        right: 210px; bottom: 60px; width: 64px; height: 64px; font-size: 11px;
+        background: linear-gradient(140deg, rgba(120, 160, 90, 0.78), rgba(60, 90, 30, 0.78));
+        border-color: #d8f0a0; color: #14240a;
+      }
+
+      /* ===================== Settings ===================== */
+      #settings-btn {
+        position: fixed; top: 12px; right: 12px; z-index: 130; width: 42px; height: 42px;
+        border-radius: 10px; background: var(--btn); border: 1px solid var(--gold); color: var(--ink);
+        font-size: 21px; cursor: pointer; pointer-events: auto;
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5); transition: transform 0.2s ease;
+      }
+      #settings-btn:hover { transform: rotate(35deg); }
+      #settings-btn:active { transform: scale(0.93); }
+      #settings-panel {
+        position: fixed; inset: 0; z-index: 140; background: rgba(8, 3, 3, 0.86);
+        display: none; flex-direction: column; justify-content: center; align-items: center;
+        text-align: center; padding: 20px; animation: fadeIn 0.25s ease;
+      }
+      #settings-panel.show { display: flex; }
+      #settings-panel .card {
+        background: var(--panel-solid); border: 1px solid var(--line); border-radius: 16px;
+        padding: 24px 28px; min-width: min(380px, 90vw);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 220, 150, 0.1);
+      }
+      #settings-panel h3 { color: var(--gold); font-size: 24px; margin-bottom: 6px; letter-spacing: 2px; }
+      #settings-panel .section-label {
+        color: var(--gold-dim); font-size: 12px; text-align: left; margin: 18px 0 8px;
+        letter-spacing: 1.5px; text-transform: uppercase;
+      }
+      .quality-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+      .quality-opt {
+        background: rgba(40, 16, 8, 0.9); border: 1px solid var(--line-dim); color: var(--gold-soft);
+        border-radius: 8px; padding: 9px 14px; font-family: inherit; font-size: 13px;
+        cursor: pointer; pointer-events: auto; transition: all 0.12s ease;
+      }
+      .quality-opt:hover { border-color: var(--line); }
+      .quality-opt.active { background: var(--btn); color: var(--ink); border-color: var(--gold); font-weight: bold; }
+      .toggle-row {
+        display: flex; justify-content: space-between; align-items: center;
+        color: var(--gold-soft); font-size: 14px; padding: 12px 2px 2px;
+      }
+      .toggle-btn {
+        background: rgba(40, 16, 8, 0.9); border: 1px solid var(--line-dim); color: var(--gold-soft);
+        border-radius: 8px; padding: 7px 18px; font-family: inherit; cursor: pointer; pointer-events: auto; min-width: 64px;
+      }
+      .toggle-btn.on { background: var(--btn); color: var(--ink); border-color: var(--gold); font-weight: bold; }
+      #settings-close {
+        margin-top: 22px; background: var(--btn); color: var(--ink); border: 2px solid var(--gold);
+        border-radius: 10px; padding: 11px 30px; font-size: 16px; font-weight: bold; font-family: inherit;
+        cursor: pointer; pointer-events: auto; letter-spacing: 1px; transition: transform 0.15s ease;
+      }
+      #settings-close:active { transform: scale(0.97); }
+
+      /* ===================== Loading ===================== */
+      #loading-screen {
+        position: fixed; inset: 0; z-index: 300;
+        background: radial-gradient(ellipse at center, #3a1810 0%, #0a0303 100%);
+        display: flex; flex-direction: column; justify-content: center; align-items: center;
+        text-align: center; transition: opacity 0.5s ease;
+      }
+      #loading-screen.hide { opacity: 0; pointer-events: none; }
+      #loading-screen h1 {
+        font-size: clamp(28px, 6vw, 52px); letter-spacing: clamp(3px, 1vw, 8px); margin-bottom: 22px;
+        background: linear-gradient(180deg, #fff6da, #ffd76b 55%, #c8901c);
+        -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+        color: #ffd76b; animation: titleGlow 4.5s ease-in-out infinite;
+      }
+      #loading-spinner {
+        width: 50px; height: 50px; border-radius: 50%;
+        border: 4px solid rgba(255, 215, 130, 0.2); border-top-color: var(--gold);
+        animation: kspin 0.9s linear infinite; margin-bottom: 18px;
+        box-shadow: 0 0 16px rgba(255, 180, 80, 0.3);
+      }
+      #loading-screen p { color: var(--gold-faint); font-size: 14px; font-style: italic; letter-spacing: 0.5px; }
+
+      /* ===================== Animations ===================== */
+      @keyframes kspin { to { transform: rotate(360deg); } }
+      @keyframes titleGlow {
+        0%, 100% { filter: drop-shadow(0 3px 10px rgba(0,0,0,0.85)) drop-shadow(0 0 18px rgba(255,180,80,0.30)); }
+        50%      { filter: drop-shadow(0 3px 10px rgba(0,0,0,0.85)) drop-shadow(0 0 30px rgba(255,200,110,0.55)); }
+      }
+      @keyframes shine { 0% { left: -60%; } 55%, 100% { left: 130%; } }
+      @keyframes sheen { 0% { transform: translateX(-100%); } 55%, 100% { transform: translateX(220%); } }
+      @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+      @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+
+      @media (prefers-reduced-motion: reduce) {
+        #start-screen, #start-screen h1, #loading-screen h1, #start-btn::before, #health-bar-inner::after { animation: none; }
+      }
+    </style>
+    <script type="module" crossorigin src="./assets/index-C2YJc6Sa.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/three-Bofs28hG.js">
+    <link rel="modulepreload" crossorigin href="./assets/SkeletonUtils-Bus5-oEV.js">
+  </head>
+  <body>
+    <canvas id="game-canvas"></canvas>
+
+    <div id="hud">
+      <div id="crosshair"></div>
+      <div id="stats-panel">
+        <div class="row"><span class="label">Slain</span><span class="value" id="stat-kills">0</span></div>
+        <div class="row"><span class="label">Remaining</span><span class="value" id="stat-remaining">0</span></div>
+        <div class="row"><span class="label">Wave</span><span class="value" id="stat-wave">1</span></div>
+      </div>
+      <div id="health-panel">
+        <div style="display:flex;justify-content:space-between;font-size:12px;">
+          <span class="label">Prana (Life)</span><span class="value" id="hp-value">100</span>
+        </div>
+        <div id="health-bar-outer"><div id="health-bar-inner"></div></div>
+      </div>
+      <div id="ammo-panel">
+        <span class="ammo-current" id="ammo-current">30</span>
+        <span class="ammo-sep">/</span>
+        <span class="ammo-reserve" id="ammo-reserve">120</span>
+      </div>
+      <div id="charge-bar-outer"><div id="charge-bar-inner"></div></div>
+      <div id="fire-mode-label">NORMAL</div>
+      <div id="message-overlay"></div>
+      <div id="fps-counter">FPS --</div>
+    </div>
+
+    <div id="touch-controls">
+      <div id="joystick-zone">
+        <div id="joystick-base"><div id="joystick-knob"></div></div>
+      </div>
+      <div id="look-zone"></div>
+      <button id="fire-btn" class="touch-btn">FIRE</button>
+      <button id="charge-btn" class="touch-btn">ASTRA</button>
+      <button id="mode-btn" class="touch-btn">NORMAL</button>
+      <button id="jump-btn" class="touch-btn">JUMP</button>
+      <button id="reload-btn" class="touch-btn">RELOAD</button>
+    </div>
+
+    <div id="start-screen">
+      <h1>KURUKSHETRA</h1>
+      <h2>Dinosaur Yuddha &mdash; The Forgotten War</h2>
+      <button id="start-btn">BEGIN THE BATTLE</button>
+      <div id="map-select">
+        <div class="map-select-label">Choose Battlefield</div>
+        <div class="map-select-row">
+          <button class="map-opt" data-map="kurukshetra">Kurukshetra<span>Dinosaur Yuddha</span></button>
+          <button class="map-opt" data-map="mumbai">Mumbai<span>Marine Drive &amp; Taj</span></button>
+          <button class="map-opt" data-map="svnit">SVNIT Surat<span>Campus Siege</span></button>
+        </div>
+      </div>
+      <div id="controls-hint">
+        Desktop: WASD move &middot; Mouse look &middot; Click fire &middot; R reload &middot; Space jump<br/>
+        Mobile: Left stick move &middot; Right side look &middot; Buttons for fire / jump / reload
+      </div>
+    </div>
+
+    <button id="settings-btn" aria-label="Settings">&#9881;</button>
+
+    <div id="settings-panel">
+      <div class="card">
+        <h3>Settings</h3>
+        <div class="section-label">Graphics Quality</div>
+        <div class="quality-row" id="quality-row">
+          <button class="quality-opt" data-tier="auto">Auto</button>
+          <button class="quality-opt" data-tier="low">Low</button>
+          <button class="quality-opt" data-tier="medium">Medium</button>
+          <button class="quality-opt" data-tier="high">High</button>
+          <button class="quality-opt" data-tier="ultra">Ultra</button>
+        </div>
+        <div class="section-label">Display</div>
+        <div class="toggle-row">
+          <span>FPS counter</span>
+          <button class="toggle-btn" id="fps-toggle">OFF</button>
+        </div>
+        <button id="settings-close">CLOSE</button>
+      </div>
+    </div>
+
+    <div id="loading-screen">
+      <h1>KURUKSHETRA</h1>
+      <div id="loading-spinner"></div>
+      <p>Forging the battlefield&hellip;</p>
+    </div>
+
+  </body>
+</html>

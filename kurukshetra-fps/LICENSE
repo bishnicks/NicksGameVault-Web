@@ -1,0 +1,42 @@
+================================================================================
+ Kurukshetra FPS — Software License (SOURCE CODE ONLY)
+================================================================================
+
+The MIT License below applies to the ORIGINAL SOURCE CODE of this project only.
+
+It does NOT grant any rights to:
+
+  * Third-party npm dependencies (e.g. Three.js) — each carries its own license.
+  * Bundled art/data assets (3D models, textures, HDRIs) — see CREDITS.md.
+  * Real-world data fetched at runtime by the Custom Map feature
+    (OpenStreetMap, AWS Terrain Tiles, Open-Meteo, Nominatim) — these are owned
+    by their respective providers and carry attribution / share-alike terms.
+    Using the Custom Map feature obligates you to display the required
+    attributions (most importantly "© OpenStreetMap contributors", ODbL).
+
+Read CREDITS.md (a.k.a. ATTRIBUTION) for the full third-party inventory and the
+attribution text you MUST surface in any distributed build that ships those
+assets or uses those data services.
+
+--------------------------------------------------------------------------------
+MIT License
+
+Copyright (c) 2026 Kurukshetra FPS contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

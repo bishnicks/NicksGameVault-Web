@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Kurukshetra FPS">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="75%">
+      <stop offset="0%" stop-color="#5a2410"/>
+      <stop offset="62%" stop-color="#2a0f08"/>
+      <stop offset="100%" stop-color="#120604"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff6da"/>
+      <stop offset="48%" stop-color="#ffd76b"/>
+      <stop offset="100%" stop-color="#b8860b"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  <g fill="none" stroke="url(#gold)" stroke-linecap="round">
+    <circle cx="256" cy="256" r="150" stroke-width="14"/>
+    <circle cx="256" cy="256" r="96" stroke-width="8"/>
+    <g stroke-width="13">
+      <line x1="352" y1="256" x2="406" y2="256"/>
+      <line x1="324" y1="324" x2="362" y2="362"/>
+      <line x1="256" y1="352" x2="256" y2="406"/>
+      <line x1="188" y1="324" x2="150" y2="362"/>
+      <line x1="160" y1="256" x2="106" y2="256"/>
+      <line x1="188" y1="188" x2="150" y2="150"/>
+      <line x1="256" y1="160" x2="256" y2="106"/>
+      <line x1="324" y1="188" x2="362" y2="150"/>
+    </g>
+  </g>
+  <circle cx="256" cy="256" r="28" fill="url(#gold)"/>
+  <circle cx="256" cy="256" r="12" fill="#ff8a1e"/>
+</svg>

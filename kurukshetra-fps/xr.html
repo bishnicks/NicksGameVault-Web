@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#1a0a05" />
+    <link rel="icon" type="image/svg+xml" href="./icons/icon.svg" />
+    <link rel="manifest" href="./xr.webmanifest" />
+    <title>Kurukshetra FPS &mdash; VR (Meta Quest 3)</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+      :root {
+        --gold: #ffd76b; --gold-soft: #f5d089; --gold-dim: #d4a55a; --gold-faint: #a07b45;
+        --ink: #1a0a05; --line: #b8860b; --line-dim: #6b3a1a;
+        --panel: linear-gradient(150deg, rgba(62,24,13,0.9), rgba(24,9,5,0.94));
+        --btn: linear-gradient(135deg, #d9a528, #8b6508);
+      }
+      html, body { width: 100%; height: 100%; overflow: hidden; background: #0a0303; color: var(--gold-soft); font-family: 'Georgia', 'Times New Roman', serif; }
+      #app { position: fixed; inset: 0; }
+      #game-canvas { display: block; width: 100vw; height: 100vh; }
+
+      /* Intro overlay (desktop / pre-VR). Hidden once a VR session starts. */
+      #overlay {
+        position: fixed; inset: 0; z-index: 50; display: flex; flex-direction: column;
+        justify-content: center; align-items: center; text-align: center; padding: 24px;
+        background: radial-gradient(ellipse at 50% 30%, rgba(122,54,22,0.5) 0%, transparent 60%),
+                    radial-gradient(ellipse at center, #3a1810 0%, #0a0303 100%);
+        transition: opacity 0.5s ease;
+      }
+      #overlay.hide { opacity: 0; pointer-events: none; }
+      #overlay h1 {
+        font-size: clamp(34px, 9vw, 76px); letter-spacing: clamp(3px, 1.4vw, 12px); line-height: 1.05;
+        background: linear-gradient(180deg, #fff6da 0%, #ffd76b 48%, #c8901c 100%);
+        -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: #ffd76b;
+      }
+      #overlay h2 { font-size: clamp(14px, 3vw, 21px); color: var(--gold-dim); font-style: italic; margin: 8px 0 22px; letter-spacing: 1px; }
+      #overlay p { max-width: 560px; color: var(--gold-faint); line-height: 1.7; font-size: clamp(13px, 2.4vw, 16px); margin-bottom: 10px; }
+      #xr-status {
+        margin-top: 18px; padding: 10px 16px; border: 1px solid var(--line-dim); border-radius: 10px;
+        background: rgba(16,8,4,0.55); font-size: 13px; max-width: 560px; line-height: 1.6;
+      }
+      #xr-status .ok { color: #9fe07a; }
+      #xr-status .warn { color: #ffb27a; }
+      .hint { margin-top: 18px; font-size: 12px; color: #8b6f3a; line-height: 1.9; }
+      .flat-link { margin-top: 14px; font-size: 12px; color: var(--gold-faint); }
+      .flat-link a { color: var(--gold-dim); text-decoration: underline; }
+
+      /* three.js VRButton is injected into <body>; give it a premium skin to match. */
+      #VRButton {
+        background: var(--btn) !important; color: var(--ink) !important; border: 2px solid var(--gold) !important;
+        border-radius: 10px !important; font-family: inherit !important; font-weight: bold !important;
+        letter-spacing: 2px !important; box-shadow: 0 6px 22px rgba(255,180,80,0.32) !important;
+        opacity: 1 !important;
+      }
+    </style>
+    <script type="module" crossorigin src="./assets/xr-uwrKpx5_.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/three-Bofs28hG.js">
+    <link rel="modulepreload" crossorigin href="./assets/SkeletonUtils-Bus5-oEV.js">
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="game-canvas"></canvas>
+    </div>
+
+    <div id="overlay">
+      <h1>KURUKSHETRA</h1>
+      <h2>VR &mdash; Dharmakshetra (Meta Quest 3)</h2>
+      <p>Put on your headset and press <strong>Enter VR</strong>. Look around the battlefield in full 6DoF; both controllers appear with aim rays. Left stick to glide, right stick to snap-turn, trigger to fire.</p>
+      <p style="font-size:12px;color:#8b6f3a">No headset? You can still explore the scene here in the browser (drag to orbit) &mdash; VR features only activate in an immersive session.</p>
+      <div id="xr-status">Checking WebXR support&hellip;</div>
+      <div class="hint">Quest 3 &middot; WebXR &middot; Three.js. Three battlefields: Kurukshetra &middot; Mumbai &middot; SVNIT.</div>
+      <div class="flat-link">Looking for the touch / keyboard &amp; mouse game? <a href="./index.html">Open the flat version</a>.</div>
+    </div>
+
+  </body>
+</html>

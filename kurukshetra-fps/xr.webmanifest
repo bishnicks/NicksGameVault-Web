@@ -1,0 +1,23 @@
+{
+  "name": "Kurukshetra FPS — VR",
+  "short_name": "Kurukshetra VR",
+  "description": "The WebXR (Meta Quest 3) profile of Kurukshetra FPS. Fight dinosaurs, aliens and robots across three battlefields — Kurukshetra, Mumbai and SVNIT Surat — in full 6DoF VR with dual-controller combat, smooth locomotion and snap-turn.",
+  "id": "/xr.html",
+  "start_url": "./xr.html",
+  "scope": "./",
+  "lang": "en",
+  "dir": "ltr",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "landscape",
+  "background_color": "#0a0303",
+  "theme_color": "#1a0a05",
+  "categories": ["games", "entertainment"],
+  "prefer_related_applications": false,
+  "icons": [
+    { "src": "icons/icon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any" },
+    { "src": "icons/icon-192.png", "type": "image/png", "sizes": "192x192", "purpose": "any" },
+    { "src": "icons/icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "any" },
+    { "src": "icons/icon-512-maskable.png", "type": "image/png", "sizes": "512x512", "purpose": "maskable" }
+  ]
+}
