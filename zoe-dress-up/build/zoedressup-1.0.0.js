@@ -1066,6 +1066,7 @@ var gameoptions = {
 * 'ZoeDressup' is the name of the game.
 */
 var game = new Kiwi.Game('content', 'ZoeDressup', null, gameoptions);
+window.zoeDressUpGame = game;
 
 
 //Add all the States we are going to use.
