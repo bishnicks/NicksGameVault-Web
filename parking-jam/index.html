@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Parking Jam">
+<meta name="theme-color" content="#1a1a2e">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Parking Jam</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #1a1a2e;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'Segoe UI', sans-serif;
+    color: #fff;
+    user-select: none;
+  }
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #ff6b6b, #ffd93d);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  #level-info {
+    font-size: 1rem;
+    color: #aaa;
+    margin-bottom: 16px;
+  }
+
+  #board-wrapper {
+    position: relative;
+    background: #16213e;
+    border-radius: 16px;
+    padding: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    margin: 0 8px;
+  }
+
+  @media (max-width: 480px) {
+    h1 { font-size: 1.5rem; margin-bottom: 4px; }
+    #level-info { font-size: 0.85rem; margin-bottom: 8px; }
+    #level-dots { margin-bottom: 8px; }
+    #board-wrapper { padding: 8px; }
+    #controls { gap: 6px; margin-top: 12px; flex-wrap: wrap; justify-content: center; }
+    button { padding: 8px 14px; font-size: 0.85rem; }
+    #btn-sound { padding: 8px 12px; }
+  }
+
+  #board {
+    position: relative;
+    background: #0f3460;
+    border-radius: 8px;
+    overflow: visible;
+  }
+
+  .cell {
+    position: absolute;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 3px;
+  }
+
+
+  .car {
+    position: absolute;
+    border-radius: 10px;
+    cursor: grab;
+    transition: filter 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    border: 2px solid rgba(255,255,255,0.25);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+    z-index: 10;
+    touch-action: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+  }
+
+  #board { touch-action: none; }
+
+  .car:hover { filter: brightness(1.15); }
+  .car.dragging { cursor: grabbing; z-index: 100; filter: brightness(1.2) drop-shadow(0 0 8px rgba(255,255,255,0.3)); }
+  .car.target {
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 2px #3b82f6, 0 0 20px 4px rgba(59,130,246,0.7), 0 4px 16px rgba(0,0,0,0.4);
+    animation: target-glow 1.2s ease-in-out infinite alternate;
+    z-index: 20;
+  }
+
+  @keyframes target-glow {
+    from { box-shadow: 0 0 0 2px #3b82f6, 0 0 16px 4px rgba(59,130,246,0.6), 0 4px 16px rgba(0,0,0,0.4); }
+    to   { box-shadow: 0 0 0 2px #ef4444, 0 0 28px 8px rgba(239,68,68,0.9), 0 4px 16px rgba(0,0,0,0.4); }
+  }
+  .car.hint-highlight { animation: pulse 0.6s ease-in-out infinite alternate; }
+
+  @keyframes pulse {
+    from { filter: brightness(1.2); }
+    to { filter: brightness(1.6) drop-shadow(0 0 10px rgba(255,255,100,0.8)); }
+  }
+
+  #exit-arrow {
+    position: absolute;
+    right: -38px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    pointer-events: none;
+    animation: bounce 1s ease-in-out infinite alternate;
+  }
+
+  #exit-arrow .exit-label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: #ffd93d;
+    text-shadow: 0 0 6px rgba(239,68,68,0.9);
+    line-height: 1;
+  }
+
+  #exit-arrow .exit-chevrons {
+    font-size: 26px;
+    font-weight: 900;
+    color: #ff6b6b;
+    text-shadow: 0 0 8px rgba(239,68,68,0.9), 0 0 14px rgba(255,217,61,0.5);
+    line-height: 1;
+  }
+
+  @keyframes bounce {
+    from { transform: translateY(-50%) translateX(0); }
+    to { transform: translateY(-50%) translateX(8px); }
+  }
+
+  #controls {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  button {
+    padding: 10px 22px;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.5px;
+  }
+
+  button:hover { transform: translateY(-2px); }
+  button:active { transform: translateY(0); }
+
+  #btn-hint {
+    background: linear-gradient(135deg, #f7971e, #ffd200);
+    color: #1a1a2e;
+  }
+
+  #btn-solution {
+    background: linear-gradient(135deg, #56ccf2, #2f80ed);
+    color: #fff;
+  }
+
+  #btn-reset {
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+  }
+
+  #btn-sound {
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+    font-size: 1.1rem;
+    padding: 10px 14px;
+  }
+
+  #btn-next {
+    background: linear-gradient(135deg, #6fcf97, #27ae60);
+    color: #fff;
+    display: none;
+  }
+
+  #level-dots {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .dot.active {
+    background: none;
+    width: auto;
+    height: auto;
+    border-radius: 0;
+    font-size: 18px;
+    line-height: 1;
+    transform: scale(1.2);
+    filter: drop-shadow(0 0 4px rgba(255,107,107,0.8));
+  }
+  .dot.done { background: none; font-size: 12px; width: auto; height: auto; border-radius: 0; line-height: 1; }
+
+  #message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    border: 2px solid #6fcf97;
+    border-radius: 20px;
+    padding: 30px 50px;
+    text-align: center;
+    z-index: 1000;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  #message.show { transform: translate(-50%, -50%) scale(1); }
+  #message h2 { font-size: 2rem; color: #ffd93d; margin-bottom: 8px; }
+  #message p { color: #aaa; margin-bottom: 16px; }
+
+  #overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+    display: none;
+  }
+
+  #overlay.show { display: block; }
+
+  #moves-display {
+    font-size: 0.9rem;
+    color: #888;
+    margin-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+<h1>PARKING JAM</h1>
+<div id="level-info">Level <span id="level-num">1</span> of 10</div>
+
+<div id="level-dots"></div>
+
+<div id="board-wrapper">
+  <div id="board"></div>
+  <div id="exit-arrow">
+    <span class="exit-label">EXIT</span>
+    <span class="exit-chevrons">▶▶</span>
+  </div>
+</div>
+
+<div id="moves-display">Moves: <span id="move-count">0</span></div>
+
+<div id="controls">
+  <button id="btn-reset">↺ Reset</button>
+  <button id="btn-hint">💡 Hint</button>
+  <button id="btn-solution">▶ Solution</button>
+  <button id="btn-sound">🔊</button>
+  <button id="btn-next">Next Level →</button>
+</div>
+
+<div id="overlay"></div>
+<div id="message">
+  <h2 id="msg-title">🎉 Level Complete!</h2>
+  <p id="msg-text">You solved it!</p>
+  <button id="btn-msg-next" style="background:linear-gradient(135deg,#6fcf97,#27ae60);color:#fff">Next Level →</button>
+  <button id="btn-msg-restart" style="background:linear-gradient(135deg,#56ccf2,#2f80ed);color:#fff;display:none;margin-left:8px">↺ Play Again</button>
+</div>
+
+<script>
+let CELL = 72;
+const GAP = 4;
+const COLS = 6;
+const ROWS = 6;
+const EXIT_ROW = 2; // target car must be at row 2 to exit right
+
+function computeCellSize() {
+  // wrapper padding (8 or 12) on each side + 8px outer margin + ~36px for exit arrow
+  const isSmall = window.innerWidth <= 480;
+  const wrapperPad = isSmall ? 8 : 12;
+  const sideMargin = 8;
+  const arrowSpace = 40;
+  const available = window.innerWidth - (wrapperPad * 2) - (sideMargin * 2) - arrowSpace;
+  const cellFromWidth = Math.floor((available - GAP * (COLS - 1)) / COLS);
+  CELL = Math.max(36, Math.min(72, cellFromWidth));
+}
+
+// Each level: array of cars
+// car: { id, col, row, len, horiz, color, target? }
+// target car is always id=0, horizontal, exits right from row EXIT_ROW
+const LEVELS = [
+  // Level 1 - very easy (2 moves)
+  {
+    cars: [
+      { id:0, col:0, row:2, len:2, horiz:true,  color:'#ffffff', target:true },
+      { id:1, col:3, row:2, len:2, horiz:false, color:'#2563eb' },
+      { id:2, col:0, row:0, len:2, horiz:true,  color:'#22c55e' },
+      { id:3, col:4, row:4, len:2, horiz:true,  color:'#a855f7' },
+    ],
+    solution: [{id:1,dir:1,steps:2},{id:0,dir:1,steps:4}]
+  },
+  // Level 2 (2 moves)
+  {
+    cars: [
+      { id:0, col:1, row:2, len:2, horiz:true,  color:'#ffffff', target:true },
+      { id:1, col:3, row:0, len:2, horiz:false, color:'#2563eb' },
+      { id:2, col:3, row:2, len:2, horiz:false, color:'#f97316' },
+      { id:3, col:4, row:1, len:2, horiz:true,  color:'#22c55e' },
+      { id:4, col:0, row:0, len:3, horiz:false, color:'#a855f7' },
+    ],
+    solution: [{id:2,dir:1,steps:2},{id:0,dir:1,steps:3}]
+  },
+  // Level 3 (3 moves)
+  {
+    cars: [
+      { id:0, col:0, row:2, len:2, horiz:true,  color:'#ffffff', target:true },
+      { id:1, col:3, row:1, len:2, horiz:false, color:'#2563eb' },
+      { id:2, col:5, row:2, len:2, horiz:false, color:'#f97316' },
+      { id:3, col:0, row:0, len:3, horiz:true,  color:'#22c55e' },
+      { id:4, col:4, row:0, len:2, horiz:false, color:'#a855f7' },
+      { id:5, col:2, row:4, len:2, horiz:true,  color:'#f5f5f5' },
+    ],
+    solution: [{id:1,dir:-1,steps:1},{id:2,dir:1,steps:2},{id:0,dir:1,steps:4}]
+  },
+  // Level 4 (4 moves)
+  {
+    cars: [
+      { id:0, col:0, row:2, len:2, horiz:true,  color:'#ffffff', target:true },
+      { id:1, col:2, row:2, len:2, horiz:false, color:'#2563eb' },
+      { id:2, col:4, row:1, len:2, horiz:false, color:'#f97316' },
+      { id:3, col:5, row:2, len:2, horiz:false, color:'#22c55e' },
+      { id:4, col:2, row:0, len:2, horiz:true,  color:'#a855f7' },
+      { id:5, col:0, row:4, len:2, horiz:true,  color:'#f5f5f5' },
+    ],
+    solution: [{id:1,dir:1,steps:2},{id:2,dir:1,steps:2},{id:3,dir:1,steps:2},{id:0,dir:1,steps:4}]
+  },
+  // Level 5 (4 moves)
+  {
+    cars: [
+      { id:0, col:0, row:2, len:2, horiz:true,  color:'#ffffff', target:true },
+      { id:1, col:2, row:1, len:2, horiz:false, color:'#2563eb' },
+      { id:2, col:3, row:2, len:2, horiz:false, color:'#f97316' },
+      { id:3, col:5, row:1, len:2, horiz:false, color:'#a855f7' },
+      { id:4, col:4, row:0, len:2, horiz:false, color:'#22c55e' },
+      { id:5, col:0, row:0, len:2, horiz:true,  color:'#f5f5f5' },
+      { id:6, col:3, row:5, len:3, horiz:true,  color:'#facc15' },
+    ],
+    solution: [{id:1,dir:-1,steps:1},{id:2,dir:1,steps:1},{id:3,dir:1,steps:2},{id:0,dir:1,steps:4}]
+  },
+  // Level 6 (5 moves)
+  {
+    cars: [
+      { id:0, col:0, row:2, len:2, horiz:true,  color:'#ffffff', target:true },
+      { id:1, col:2, row:2, len:2, horiz:false, color:'#2563eb' },
+      { id:2, col:3, row:1, len:2, horiz:false, color:'#22c55e' },
+      { id:3, col:4, row:2, len:2, horiz:false, color:'#f97316' },
+      { id:4, col:5, row:1, len:2, horiz:false, color:'#a855f7' },
+      { id:5, col:4, row:0, len:2, horiz:true,  color:'#f5f5f5' },
+      { id:6, col:0, row:0, len:3, horiz:true,  color:'#facc15' },
+      { id:7, col:0, row:4, len:2, horiz:true,  color:'#ec4899' },
+    ],
+    solution: [{id:4,dir:1,steps:2},{id:3,dir:1,steps:2},{id:2,dir:-1,steps:1},{id:1,dir:1,steps:2},{id:0,dir:1,steps:4}]
+  },
+  // Level 7 (5 moves)
+  {
+    cars: [
+      { id:0, col:0, row:2, len:2, horiz:true,  color:'#ffffff', target:true },
+      { id:1, col:2, row:2, len:2, horiz:false, color:'#2563eb' },
+      { id:2, col:4, row:1, len:2, horiz:false, color:'#22c55e' },
+      { id:3, col:5, row:2, len:2, horiz:false, color:'#f97316' },
+      { id:4, col:4, row:4, len:2, horiz:false, color:'#a855f7' },
+      { id:5, col:3, row:0, len:2, horiz:true,  color:'#f5f5f5' },
+      { id:6, col:0, row:0, len:2, horiz:true,  color:'#facc15' },
+      { id:7, col:2, row:5, len:2, horiz:true,  color:'#ec4899' },
+    ],
+    solution: [{id:5,dir:-1,steps:1},{id:2,dir:-1,steps:1},{id:1,dir:1,steps:1},{id:3,dir:1,steps:2},{id:0,dir:1,steps:4}]
+  },
+  // Level 8 (5 moves)
+  {
+    cars: [
+      { id:0, col:1, row:2, len:2, horiz:true,  color:'#ffffff', target:true },
+      { id:1, col:3, row:1, len:2, horiz:false, color:'#2563eb' },
+      { id:2, col:4, row:2, len:2, horiz:false, color:'#22c55e' },
+      { id:3, col:5, row:1, len:2, horiz:false, color:'#f97316' },
+      { id:4, col:3, row:0, len:2, horiz:true,  color:'#a855f7' },
+      { id:5, col:0, row:0, len:2, horiz:true,  color:'#f5f5f5' },
+      { id:6, col:4, row:4, len:2, horiz:false, color:'#facc15' },
+      { id:7, col:1, row:4, len:2, horiz:true,  color:'#ec4899' },
+      { id:8, col:0, row:3, len:2, horiz:true,  color:'#78350f' },
+    ],
+    solution: [{id:4,dir:-1,steps:1},{id:3,dir:-1,steps:1},{id:1,dir:1,steps:2},{id:2,dir:-1,steps:2},{id:0,dir:1,steps:3}]
+  },
+  // Level 9 (5 moves)
+  {
+    cars: [
+      { id:0, col:0, row:2, len:2, horiz:true,  color:'#ffffff', target:true },
+      { id:1, col:2, row:2, len:2, horiz:false, color:'#2563eb' },
+      { id:2, col:3, row:1, len:2, horiz:false, color:'#22c55e' },
+      { id:3, col:4, row:2, len:2, horiz:false, color:'#f97316' },
+      { id:4, col:5, row:1, len:2, horiz:false, color:'#a855f7' },
+      { id:5, col:3, row:0, len:2, horiz:true,  color:'#f5f5f5' },
+      { id:6, col:0, row:0, len:2, horiz:true,  color:'#facc15' },
+      { id:7, col:0, row:4, len:3, horiz:true,  color:'#ec4899' },
+    ],
+    solution: [{id:1,dir:-1,steps:2},{id:2,dir:1,steps:2},{id:3,dir:1,steps:2},{id:4,dir:-1,steps:1},{id:0,dir:1,steps:4}]
+  },
+  // Level 10 (7 moves)
+  {
+    cars: [
+      { id:0, col:0, row:2, len:2, horiz:true,  color:'#ffffff', target:true },
+      { id:1, col:2, row:1, len:2, horiz:false, color:'#2563eb' },
+      { id:2, col:3, row:2, len:2, horiz:false, color:'#22c55e' },
+      { id:3, col:4, row:1, len:2, horiz:false, color:'#f97316' },
+      { id:4, col:5, row:1, len:2, horiz:false, color:'#a855f7' },
+      { id:5, col:4, row:0, len:2, horiz:true,  color:'#f5f5f5' },
+      { id:6, col:0, row:0, len:3, horiz:true,  color:'#facc15' },
+      { id:7, col:2, row:4, len:2, horiz:true,  color:'#ec4899' },
+    ],
+    solution: [{id:7,dir:-1,steps:2},{id:2,dir:1,steps:2},{id:1,dir:1,steps:2},{id:5,dir:-1,steps:1},{id:4,dir:-1,steps:1},{id:3,dir:1,steps:2},{id:0,dir:1,steps:4}]
+  },
+];
+
+let currentLevel = 0;
+let cars = [];
+let moveCount = 0;
+let solvingMode = false;
+let solveTimer = null;
+
+// Sound effects using Web Audio API
+let soundEnabled = true;
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx;
+let carEngineBuffer = null, _carEngineRaw = null;
+
+fetch('./car-engine.mp3')
+  .then(r => r.arrayBuffer())
+  .then(ab => {
+    if (audioCtx) {
+      audioCtx.decodeAudioData(ab).then(buf => { carEngineBuffer = buf; }).catch(() => {});
+    } else {
+      _carEngineRaw = ab;
+    }
+  }).catch(() => {});
+
+function getAudioCtx() {
+  if (!audioCtx) {
+    audioCtx = new AudioCtx();
+    if (_carEngineRaw) {
+      audioCtx.decodeAudioData(_carEngineRaw)
+        .then(buf => { carEngineBuffer = buf; _carEngineRaw = null; })
+        .catch(() => {});
+    }
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function playMove() {
+  if (!soundEnabled) return;
+  const ctx = getAudioCtx();
+  const t0 = ctx.currentTime;
+  const dur = 0.16;
+
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.setValueAtTime(1200, t0);
+  filter.frequency.exponentialRampToValueAtTime(2400, t0 + 0.05);
+  filter.frequency.exponentialRampToValueAtTime(900, t0 + dur);
+  filter.Q.value = 4;
+
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.0001, t0);
+  gain.gain.exponentialRampToValueAtTime(0.35, t0 + 0.015);
+  gain.gain.exponentialRampToValueAtTime(0.001, t0 + dur);
+  filter.connect(gain);
+  gain.connect(ctx.destination);
+
+  // Detuned sawtooth pair: quick rev from idle to higher rpm and back
+  [-8, 8].forEach((detune) => {
+    const osc = ctx.createOscillator();
+    osc.type = 'sawtooth';
+    osc.detune.value = detune;
+    osc.frequency.setValueAtTime(140, t0);
+    osc.frequency.exponentialRampToValueAtTime(260, t0 + 0.05);
+    osc.frequency.exponentialRampToValueAtTime(170, t0 + dur);
+    osc.connect(filter);
+    osc.start(t0);
+    osc.stop(t0 + dur);
+  });
+}
+
+let engine = null;
+
+function carVoice(car) {
+  // Length sets the base register (truck = low diesel rumble, car = higher revving).
+  // Per-id offsets give each car a distinct pitch and timbre so you can hear which one is moving.
+  const baseIdle = car.len === 3 ? 70 : 140;
+  const pitchShift = ((car.id * 19) % 41) - 20; // -20..+20 Hz
+  const idle = Math.max(40, baseIdle + pitchShift);
+  const rev = idle * 1.9;
+  const cutoffIdle = 900 + ((car.id * 73) % 700); // 900..1600
+  const cutoffRev = cutoffIdle * 2.4;
+  const detune = 5 + (car.id % 7); // 5..11
+  const lfoRate = 5 + (car.id % 5); // 5..9
+  // Sawtooth for most; square for the target car (id=0) and every 3rd car for variety
+  const wave = (car.id === 0 || car.id % 3 === 2) ? 'square' : 'sawtooth';
+  const voice = { idle, rev, cutoffIdle, cutoffRev, detune, lfoRate, wave };
+  // Player car (ambulance 🚑): two-tone siren while moving, no engine drone
+  if (car.target) {
+    voice.silent = true;
+    voice.siren = { type: 'twotone', high: 980, low: 720, rate: 2.0, gain: 0.32 };
+  }
+  // Taxi (id 1 = 🚕): impatient dual-tone NYC cab honk — 3 quick BWAAH!s on pickup
+  if (car.id === 1) {
+    voice.idle = 95;
+    voice.rev = 210;
+    voice.cutoffIdle = 1100;
+    voice.cutoffRev = 2300;
+    voice.detune = 11;
+    voice.lfoRate = 3.5;
+    voice.wave = 'sawtooth';
+    voice.horn = { tones: [392, 392, 392], gap: 0.11, dur: 0.13, gain: 0.24, chord: true };
+  }
+  // Emergency vehicles by icon:
+  // id 7 = 🚒 fire engine (wail), id 3 = 🚓 police (yelp)
+  if (car.id === 7) {
+    voice.siren = { type: 'wail', carrier: 780, depth: 320, rate: 1.6, gain: 0.35 };
+  } else if (car.id === 3) {
+    voice.siren = { type: 'yelp', carrier: 850, depth: 280, rate: 4.5, gain: 0.32 };
+  }
+  return voice;
+}
+
+function playHorn(cfg) {
+  if (!soundEnabled) return;
+  const ctx = getAudioCtx();
+  const t0 = ctx.currentTime;
+  // Dual-tone car horn uses a major third (freq * 5/4) layered for the classic "BWAAAH"
+  cfg.tones.forEach((freq, i) => {
+    const start = t0 + i * (cfg.gap + cfg.dur);
+    const pitches = cfg.chord ? [freq, freq * 1.25] : [freq];
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 1600;
+    filter.Q.value = 3;
+
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, start);
+    g.gain.exponentialRampToValueAtTime(cfg.gain, start + 0.01);
+    g.gain.setValueAtTime(cfg.gain, start + cfg.dur - 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, start + cfg.dur);
+
+    filter.connect(g);
+    g.connect(ctx.destination);
+
+    pitches.forEach((p) => {
+      [0, 6].forEach((det) => {
+        const osc = ctx.createOscillator();
+        osc.type = 'sawtooth';
+        osc.frequency.value = p;
+        osc.detune.value = det;
+        osc.connect(filter);
+        osc.start(start);
+        osc.stop(start + cfg.dur + 0.02);
+      });
+    });
+  });
+}
+
+function createSiren(ctx, t0, cfg) {
+  const out = ctx.createGain();
+  out.gain.setValueAtTime(0.0001, t0);
+  out.gain.exponentialRampToValueAtTime(cfg.gain, t0 + 0.05);
+  out.connect(ctx.destination);
+
+  // Two detuned triangle oscillators — sharper than sine, less harsh than square.
+  const carriers = [-4, 4].map(() => {
+    const o = ctx.createOscillator();
+    o.type = 'triangle';
+    return o;
+  });
+
+  const lfo = ctx.createOscillator();
+  const lfoGain = ctx.createGain();
+  lfo.connect(lfoGain);
+  carriers.forEach((c) => lfoGain.connect(c.frequency));
+
+  if (cfg.type === 'wail') {
+    carriers.forEach((c, i) => { c.frequency.value = cfg.carrier; c.detune.value = i === 0 ? -7 : 7; });
+    lfo.type = 'sine';
+    lfo.frequency.value = cfg.rate;
+    lfoGain.gain.value = cfg.depth;
+  } else if (cfg.type === 'yelp') {
+    // Sawtooth LFO sweeps frequency up and snaps back — classic police yelp
+    carriers.forEach((c, i) => { c.frequency.value = cfg.carrier; c.detune.value = i === 0 ? -7 : 7; });
+    lfo.type = 'sawtooth';
+    lfo.frequency.value = cfg.rate;
+    lfoGain.gain.value = cfg.depth;
+  } else { // twotone
+    const mid = (cfg.high + cfg.low) / 2;
+    carriers.forEach((c, i) => { c.frequency.value = mid; c.detune.value = i === 0 ? -7 : 7; });
+    lfo.type = 'square';
+    lfo.frequency.value = cfg.rate;
+    lfoGain.gain.value = (cfg.high - cfg.low) / 2;
+  }
+
+  carriers.forEach((c) => { c.connect(out); c.start(t0); });
+  lfo.start(t0);
+  return { carriers, lfo, out };
+}
+
+function startEngine(car) {
+  if (!soundEnabled) return;
+  if (engine) return;
+  const ctx = getAudioCtx();
+  const t0 = ctx.currentTime;
+  const v = carVoice(car);
+
+  // Real WAV sample for non-siren cars
+  if (!v.siren && carEngineBuffer) {
+    if (v.horn) playHorn(v.horn);
+    const source = ctx.createBufferSource();
+    source.buffer = carEngineBuffer;
+    source.loop = true;
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.0001, t0);
+    gain.gain.exponentialRampToValueAtTime(0.6, t0 + 0.15);
+    source.connect(gain);
+    gain.connect(ctx.destination);
+    source.start(t0);
+    engine = { bufferSource: source, gain, voice: v, siren: null };
+    return;
+  }
+
+  // Oscillator-based engine for siren cars (ambulance, fire truck, police)
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.setValueAtTime(v.cutoffIdle, t0);
+  filter.Q.value = 3;
+
+  const engineGainPeak = (v.siren || v.silent) ? 0.0001 : 0.16;
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.0001, t0);
+  gain.gain.exponentialRampToValueAtTime(engineGainPeak, t0 + 0.06);
+  filter.connect(gain);
+  gain.connect(ctx.destination);
+
+  const oscs = [-v.detune, v.detune].map((d) => {
+    const osc = ctx.createOscillator();
+    osc.type = v.wave;
+    osc.detune.value = d;
+    osc.frequency.setValueAtTime(v.idle, t0);
+    osc.connect(filter);
+    osc.start(t0);
+    return osc;
+  });
+
+  const lfo = ctx.createOscillator();
+  lfo.frequency.value = v.lfoRate;
+  const lfoGain = ctx.createGain();
+  lfoGain.gain.value = 5;
+  lfo.connect(lfoGain);
+  oscs.forEach((o) => lfoGain.connect(o.detune));
+  lfo.start(t0);
+
+  let tremLfo = null;
+  if (v.tremolo) {
+    tremLfo = ctx.createOscillator();
+    tremLfo.type = 'sine';
+    tremLfo.frequency.value = v.tremolo.rate;
+    const tremDepth = ctx.createGain();
+    tremDepth.gain.value = v.tremolo.depth * engineGainPeak;
+    tremLfo.connect(tremDepth);
+    tremDepth.connect(gain.gain);
+    tremLfo.start(t0);
+  }
+
+  const siren = v.siren ? createSiren(ctx, t0, v.siren) : null;
+  if (v.horn) playHorn(v.horn);
+
+  engine = { oscs, lfo, tremLfo, gain, filter, voice: v, siren };
+}
+
+function revEngine() {
+  if (!engine || engine.bufferSource) return;
+  const ctx = getAudioCtx();
+  const t = ctx.currentTime;
+  const v = engine.voice;
+  engine.oscs.forEach((osc) => {
+    osc.frequency.cancelScheduledValues(t);
+    osc.frequency.setValueAtTime(osc.frequency.value, t);
+    osc.frequency.exponentialRampToValueAtTime(v.rev, t + 0.04);
+    osc.frequency.exponentialRampToValueAtTime(v.idle, t + 0.28);
+  });
+  const f = engine.filter.frequency;
+  f.cancelScheduledValues(t);
+  f.setValueAtTime(f.value, t);
+  f.exponentialRampToValueAtTime(v.cutoffRev, t + 0.04);
+  f.exponentialRampToValueAtTime(v.cutoffIdle, t + 0.28);
+}
+
+function stopEngine() {
+  if (!engine) return;
+  const ctx = getAudioCtx();
+  const t = ctx.currentTime;
+  const stopAt = t + 0.12;
+  const { gain, siren } = engine;
+  gain.gain.cancelScheduledValues(t);
+  gain.gain.setValueAtTime(gain.gain.value, t);
+  gain.gain.exponentialRampToValueAtTime(0.0005, stopAt);
+  if (engine.bufferSource) {
+    engine.bufferSource.stop(stopAt + 0.05);
+  } else {
+    const { oscs, lfo, tremLfo } = engine;
+    oscs.forEach((o) => o.stop(stopAt + 0.05));
+    lfo.stop(stopAt + 0.05);
+    if (tremLfo) tremLfo.stop(stopAt + 0.05);
+  }
+  if (siren) {
+    siren.out.gain.cancelScheduledValues(t);
+    siren.out.gain.setValueAtTime(siren.out.gain.value, t);
+    siren.out.gain.exponentialRampToValueAtTime(0.0001, stopAt);
+    siren.carriers.forEach((c) => c.stop(stopAt + 0.05));
+    siren.lfo.stop(stopAt + 0.05);
+  }
+  engine = null;
+}
+
+function playWin() {
+  if (!soundEnabled) return;
+  const ctx = getAudioCtx();
+  const notes = [523, 659, 784, 1047];
+  notes.forEach((freq, i) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.12);
+    gain.gain.setValueAtTime(0.2, ctx.currentTime + i * 0.12);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.12 + 0.3);
+    osc.start(ctx.currentTime + i * 0.12);
+    osc.stop(ctx.currentTime + i * 0.12 + 0.3);
+  });
+}
+
+function playApplause() {
+  if (!soundEnabled) return;
+  const ctx = getAudioCtx();
+  const notes = [523, 587, 659, 698, 784, 880, 988, 1047];
+  notes.forEach((freq, i) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.15);
+    gain.gain.setValueAtTime(0.2, ctx.currentTime + i * 0.15);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.15 + 0.4);
+    osc.start(ctx.currentTime + i * 0.15);
+    osc.stop(ctx.currentTime + i * 0.15 + 0.4);
+  });
+  // Add a chime cascade after
+  setTimeout(() => {
+    const ctx2 = getAudioCtx();
+    for (let i = 0; i < 5; i++) {
+      const osc = ctx2.createOscillator();
+      const gain = ctx2.createGain();
+      osc.connect(gain);
+      gain.connect(ctx2.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1200 + i * 200, ctx2.currentTime + i * 0.1);
+      gain.gain.setValueAtTime(0.12, ctx2.currentTime + i * 0.1);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx2.currentTime + i * 0.1 + 0.5);
+      osc.start(ctx2.currentTime + i * 0.1);
+      osc.stop(ctx2.currentTime + i * 0.1 + 0.5);
+    }
+  }, 1300);
+}
+
+function playClick() {
+  if (!soundEnabled) return;
+  const ctx = getAudioCtx();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.type = 'square';
+  osc.frequency.setValueAtTime(800, ctx.currentTime);
+  gain.gain.setValueAtTime(0.06, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+  osc.start(ctx.currentTime);
+  osc.stop(ctx.currentTime + 0.05);
+}
+
+const board = document.getElementById('board');
+const levelNum = document.getElementById('level-num');
+const moveCountEl = document.getElementById('move-count');
+const btnHint = document.getElementById('btn-hint');
+const btnSolution = document.getElementById('btn-solution');
+const btnReset = document.getElementById('btn-reset');
+const btnNext = document.getElementById('btn-next');
+const message = document.getElementById('message');
+const overlay = document.getElementById('overlay');
+const msgText = document.getElementById('msg-text');
+const btnMsgNext = document.getElementById('btn-msg-next');
+const btnMsgRestart = document.getElementById('btn-msg-restart');
+const msgTitle = document.getElementById('msg-title');
+
+function cellPx(n) { return n * (CELL + GAP); }
+
+function buildBoard() {
+  computeCellSize();
+  board.innerHTML = '';
+  const size = COLS * CELL + (COLS - 1) * GAP;
+  board.style.width = size + 'px';
+  board.style.height = size + 'px'; // rows = cols = 6
+
+  // grid cells background
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.style.left = cellPx(c) + 'px';
+      cell.style.top = cellPx(r) + 'px';
+      cell.style.width = CELL + 'px';
+      cell.style.height = CELL + 'px';
+      board.appendChild(cell);
+    }
+  }
+
+  // position exit arrow at EXIT_ROW
+  const arrow = document.getElementById('exit-arrow');
+  const exitY = cellPx(EXIT_ROW) + CELL / 2;
+  arrow.style.top = exitY + 'px';
+  arrow.style.transform = 'translateY(-50%)';
+}
+
+function renderCars() {
+  // remove old car elements
+  document.querySelectorAll('.car').forEach(e => e.remove());
+
+  cars.forEach(car => {
+    const el = document.createElement('div');
+    el.className = 'car' + (car.target ? ' target' : '');
+    el.dataset.id = car.id;
+
+    const w = car.horiz ? cellPx(car.len) - GAP : CELL;
+    const h = car.horiz ? CELL : cellPx(car.len) - GAP;
+    el.style.width = w + 'px';
+    el.style.height = h + 'px';
+    el.style.left = cellPx(car.col) + 'px';
+    el.style.top = cellPx(car.row) + 'px';
+    const r = parseInt(car.color.slice(1,3),16);
+    const g = parseInt(car.color.slice(3,5),16);
+    const b = parseInt(car.color.slice(5,7),16);
+    const alpha = car.target ? 0.18 : 0.45;
+    el.style.background = `rgba(${r},${g},${b},${alpha})`;
+    el.style.backdropFilter = 'blur(2px)';
+    el.style.webkitBackdropFilter = 'blur(2px)';
+
+    // icon — emojis face left by default; flip horizontals to face the exit,
+    // rotate verticals so they point along their axis
+    const icon = document.createElement('span');
+    icon.textContent = car.target ? '🚑' : ['🚙','🚕','🚌','🚓','🏎️','🚐','🚗','🚒','🛻'][car.id % 9];
+    icon.style.display = 'inline-block';
+    icon.style.fontSize = Math.round(CELL * 0.85) + 'px';
+    icon.style.lineHeight = '1';
+    icon.style.transform = car.horiz ? 'scaleX(-1)' : 'rotate(90deg)';
+    el.appendChild(icon);
+
+    board.appendChild(el);
+    attachDrag(el, car);
+  });
+}
+
+function getOccupied(excludeId) {
+  const occ = new Set();
+  cars.forEach(car => {
+    if (car.id === excludeId) return;
+    for (let i = 0; i < car.len; i++) {
+      occ.add(car.horiz ? `${car.col+i},${car.row}` : `${car.col},${car.row+i}`);
+    }
+  });
+  return occ;
+}
+
+function canMove(car, dir, steps) {
+  const occ = getOccupied(car.id);
+  for (let s = 1; s <= steps; s++) {
+    if (car.horiz) {
+      const nc = car.col + dir * s;
+      if (nc < 0 || nc + car.len > COLS) return false;
+      if (occ.has(`${nc + (dir > 0 ? car.len - 1 : 0)},${car.row}`)) return false;
+    } else {
+      const nr = car.row + dir * s;
+      if (nr < 0 || nr + car.len > ROWS) return false;
+      if (occ.has(`${car.col},${nr + (dir > 0 ? car.len - 1 : 0)}`)) return false;
+    }
+  }
+  return true;
+}
+
+function maxMoves(car, dir) {
+  let s = 0;
+  while (canMove(car, dir, s + 1)) s++;
+  return s;
+}
+
+function moveCar(car, dir, steps) {
+  if (!canMove(car, dir, steps)) return false;
+  if (car.horiz) car.col += dir * steps;
+  else car.row += dir * steps;
+  moveCount++;
+  moveCountEl.textContent = moveCount;
+  updateCarEl(car);
+  checkWin();
+  return true;
+}
+
+function updateCarEl(car) {
+  const el = board.querySelector(`[data-id="${car.id}"]`);
+  if (!el) return;
+  el.style.left = cellPx(car.col) + 'px';
+  el.style.top = cellPx(car.row) + 'px';
+}
+
+function checkWin() {
+  const target = cars.find(c => c.target);
+  if (target && target.col + target.len === COLS && target.row === EXIT_ROW) {
+    setTimeout(showWin, 300);
+  }
+}
+
+function showWin() {
+  if (currentLevel < LEVELS.length - 1) {
+    msgTitle.textContent = '🎉 Level Complete!';
+    msgText.textContent = `Solved in ${moveCount} moves! Ready for level ${currentLevel + 2}?`;
+    btnMsgNext.style.display = '';
+    btnMsgRestart.style.display = 'none';
+    playWin();
+  } else {
+    msgTitle.textContent = '🏆 All Levels Cleared!';
+    msgText.textContent = `You completed all 10 levels! You're a parking master!`;
+    btnMsgNext.style.display = 'none';
+    btnMsgRestart.style.display = '';
+    playApplause();
+    launchApplause();
+  }
+  overlay.classList.add('show');
+  message.classList.add('show');
+}
+
+function launchApplause() {
+  const emojis = ['🎉','🎊','🏆','⭐','🥳','👏','🎈','✨','🔥','💯'];
+  const container = document.createElement('div');
+  container.id = 'applause';
+  container.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:2000;overflow:hidden;';
+  document.body.appendChild(container);
+
+  for (let i = 0; i < 60; i++) {
+    setTimeout(() => {
+      const p = document.createElement('div');
+      p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      p.style.cssText = `position:absolute;font-size:${24 + Math.random()*28}px;left:${Math.random()*100}%;top:100%;animation:applause-rise ${2+Math.random()*2}s ease-out forwards;opacity:1;`;
+      container.appendChild(p);
+    }, i * 80);
+  }
+
+  if (!document.getElementById('applause-style')) {
+    const style = document.createElement('style');
+    style.id = 'applause-style';
+    style.textContent = `@keyframes applause-rise{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(-110vh) rotate(${360}deg);opacity:0}}`;
+    document.head.appendChild(style);
+  }
+
+  setTimeout(() => container.remove(), 8000);
+}
+
+function attachDrag(el, car) {
+  let startX, startY, startCol, startRow, dragging = false;
+
+  const endDrag = () => {
+    if (!dragging) return;
+    dragging = false;
+    el.classList.remove('dragging');
+    stopEngine();
+    if (car.col !== startCol || car.row !== startRow) {
+      moveCount++;
+      moveCountEl.textContent = moveCount;
+      checkWin();
+    }
+  };
+
+  el.addEventListener('pointerdown', e => {
+    if (solvingMode) return;
+    e.preventDefault();
+    dragging = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    startCol = car.col;
+    startRow = car.row;
+    el.setPointerCapture(e.pointerId);
+    el.classList.add('dragging');
+    clearHints();
+    startEngine(car);
+  });
+
+  el.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+
+    if (car.horiz) {
+      const newCol = startCol + Math.round(dx / (CELL + GAP));
+      const clamped = Math.max(0, Math.min(COLS - car.len, newCol));
+      // check occupancy step by step
+      const dir = clamped > startCol ? 1 : -1;
+      const steps = Math.abs(clamped - startCol);
+      if (steps > 0 && canMove({ ...car, col: startCol }, dir, steps)) {
+        car.col = startCol + dir * steps;
+      } else if (steps === 0) {
+        car.col = startCol;
+      }
+      el.style.left = cellPx(car.col) + 'px';
+    } else {
+      const newRow = startRow + Math.round(dy / (CELL + GAP));
+      const clamped = Math.max(0, Math.min(ROWS - car.len, newRow));
+      const dir = clamped > startRow ? 1 : -1;
+      const steps = Math.abs(clamped - startRow);
+      if (steps > 0 && canMove({ ...car, row: startRow }, dir, steps)) {
+        car.row = startRow + dir * steps;
+      } else if (steps === 0) {
+        car.row = startRow;
+      }
+      el.style.top = cellPx(car.row) + 'px';
+    }
+  });
+
+  el.addEventListener('pointerup', endDrag);
+  el.addEventListener('pointercancel', endDrag);
+}
+
+function clearHints() {
+  document.querySelectorAll('.car').forEach(e => e.classList.remove('hint-highlight'));
+}
+
+function hint() {
+  if (solvingMode) return;
+  clearHints();
+  const level = LEVELS[currentLevel];
+  const sol = level.solution;
+  if (!sol || sol.length === 0) return;
+
+  // Simulate the solution from the original state, find the first step
+  // whose resulting position doesn't match current board state
+  const simCars = deepCloneCars(level.cars);
+  let nextStep = null;
+
+  for (let i = 0; i < sol.length; i++) {
+    const step = sol[i];
+    const simCar = simCars.find(c => c.id === step.id);
+    if (!simCar) continue;
+
+    // Apply the step to simulation
+    if (simCar.horiz) simCar.col += step.dir * step.steps;
+    else simCar.row += step.dir * step.steps;
+
+    // Check if current board matches simulation up to this point
+    const currentCar = cars.find(c => c.id === step.id);
+    if (!currentCar) continue;
+    if (currentCar.col !== simCar.col || currentCar.row !== simCar.row) {
+      // This step hasn't been done yet - highlight the car and show direction
+      nextStep = step;
+      break;
+    }
+  }
+
+  if (nextStep) {
+    const el = board.querySelector(`[data-id="${nextStep.id}"]`);
+    if (el) {
+      el.classList.add('hint-highlight');
+      setTimeout(clearHints, 2500);
+    }
+  }
+}
+
+function deepCloneCars(carsArr) {
+  return carsArr.map(c => ({ ...c }));
+}
+
+function loadLevel(idx) {
+  currentLevel = idx;
+  moveCount = 0;
+  moveCountEl.textContent = 0;
+  solvingMode = false;
+  clearTimeout(solveTimer);
+
+  const level = LEVELS[idx];
+  cars = deepCloneCars(level.cars);
+
+  levelNum.textContent = idx + 1;
+  buildBoard();
+  renderCars();
+  updateDots();
+
+  btnNext.style.display = 'none';
+  message.classList.remove('show');
+  overlay.classList.remove('show');
+}
+
+function updateDots() {
+  const container = document.getElementById('level-dots');
+  container.innerHTML = '';
+  LEVELS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === currentLevel ? ' active' : i < currentLevel ? ' done' : '');
+    if (i === currentLevel) d.textContent = '🚦';
+    else if (i < currentLevel) d.textContent = '❤️';
+    d.addEventListener('click', () => loadLevel(i));
+    container.appendChild(d);
+  });
+}
+
+async function showSolution() {
+  if (solvingMode) {
+    solvingMode = false;
+    loadLevel(currentLevel);
+    btnSolution.textContent = '▶ Solution';
+    return;
+  }
+  loadLevel(currentLevel);
+  solvingMode = true;
+  btnSolution.textContent = '⏹ Stop';
+  await new Promise(r => setTimeout(r, 400));
+
+  const sol = LEVELS[currentLevel].solution;
+  for (const step of sol) {
+    if (!solvingMode) break;
+    const car = cars.find(c => c.id === step.id);
+    if (!car) continue;
+    const el = board.querySelector(`[data-id="${step.id}"]`);
+    if (el) el.classList.add('hint-highlight');
+    await new Promise(r => setTimeout(r, 600));
+    if (!solvingMode) break;
+    if (el) el.classList.remove('hint-highlight');
+    startEngine(car);
+    await new Promise(r => setTimeout(r, 80));
+    for (let i = 0; i < step.steps; i++) {
+      revEngine();
+      await new Promise(r => setTimeout(r, 110));
+    }
+    moveCar(car, step.dir, step.steps);
+    await new Promise(r => setTimeout(r, 220));
+    stopEngine();
+  }
+
+  solvingMode = false;
+  btnSolution.textContent = '▶ Solution';
+}
+
+const btnSound = document.getElementById('btn-sound');
+btnSound.addEventListener('click', () => {
+  soundEnabled = !soundEnabled;
+  btnSound.textContent = soundEnabled ? '🔊' : '🔇';
+});
+btnHint.addEventListener('click', () => { playClick(); hint(); });
+btnSolution.addEventListener('click', () => { playClick(); showSolution(); });
+btnReset.addEventListener('click', () => { playClick(); solvingMode = false; loadLevel(currentLevel); btnSolution.textContent = '▶ Solution'; });
+btnNext.addEventListener('click', () => { playClick(); if (currentLevel < LEVELS.length - 1) loadLevel(currentLevel + 1); });
+btnMsgNext.addEventListener('click', () => {
+  playClick();
+  message.classList.remove('show');
+  overlay.classList.remove('show');
+  if (currentLevel < LEVELS.length - 1) loadLevel(currentLevel + 1);
+});
+btnMsgRestart.addEventListener('click', () => {
+  playClick();
+  message.classList.remove('show');
+  overlay.classList.remove('show');
+  loadLevel(0);
+});
+overlay.addEventListener('click', () => {
+  message.classList.remove('show');
+  overlay.classList.remove('show');
+});
+
+loadLevel(0);
+
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    buildBoard();
+    renderCars();
+  }, 100);
+});
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').then(reg => {
+    // when a new SW installs, activate it immediately
+    reg.addEventListener('updatefound', () => {
+      reg.installing.addEventListener('statechange', e => {
+        if (e.target.state === 'activated') window.location.reload();
+      });
+    });
+    // poll for updates every 60s (iOS doesn't check automatically)
+    setInterval(() => reg.update(), 60000);
+  });
+  // reload as soon as a new SW takes control (covers the skipWaiting path)
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    window.location.reload();
+  });
+}
+</script>
+<a href="../arcade-launcher.html?v=35" style="position:fixed;left:max(10px,env(safe-area-inset-left));bottom:max(10px,env(safe-area-inset-bottom));z-index:9999;padding:9px 13px;border:2px solid #fff;border-radius:12px;background:#16213eee;color:#fff;text-decoration:none;font:700 13px 'Segoe UI',sans-serif;box-shadow:0 4px 14px #0008">Game Hub</a>
+</body>
+</html>
