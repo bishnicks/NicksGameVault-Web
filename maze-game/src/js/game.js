@@ -40,6 +40,8 @@ class MazeGame {
     this.canvas = document.getElementById('mazeCanvas');
     if (!this.canvas) return; // nothing to do without a canvas (e.g. tests)
     this.ctx = this.canvas.getContext('2d');
+    this.adventureGirl = new Image();
+    this.adventureGirl.src = 'utils/adventure-girl.png';
 
     // Persisted preferences
     this.settings = this.loadSettings();
@@ -804,6 +806,18 @@ class MazeGame {
   drawPlayer() {
     const c = this.cellSize,
       p = this.palette();
+    if (this.adventureGirl.complete && this.adventureGirl.naturalWidth) {
+      const h = c * 1.18;
+      const w = h * (this.adventureGirl.naturalWidth / this.adventureGirl.naturalHeight);
+      const cx = this.player.rx * c + c / 2;
+      const cy = this.player.ry * c + c / 2;
+      this.ctx.save();
+      this.ctx.shadowBlur = p.glow ? 14 : 6;
+      this.ctx.shadowColor = p.player;
+      this.ctx.drawImage(this.adventureGirl, cx - w / 2, cy - h * 0.64, w, h);
+      this.ctx.restore();
+      return;
+    }
     if (p.glow) {
       this.ctx.shadowBlur = 16;
       this.ctx.shadowColor = p.player;

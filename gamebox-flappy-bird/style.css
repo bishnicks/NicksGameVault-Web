@@ -1,3 +1,4 @@
 .flappy-shell{max-width:380px}
 #canvas{display:block;margin:0 auto;background:#0a0c12;border:1px solid var(--gb-border);border-radius:var(--gb-radius);max-width:100%;height:auto;cursor:pointer;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 .control-hint{color:var(--gb-text-muted);font-size:.85rem;margin:.8rem 0}
+.flappy-characters{display:flex;justify-content:center;gap:8px;margin:10px 0 4px}.flyer-choice{min-height:42px;padding:8px 12px;border:1px solid var(--gb-border);border-radius:10px;background:#22283a;color:#fff;font-weight:700;touch-action:manipulation}.flyer-choice.selected{background:#b83280;border-color:#ffb7df;box-shadow:0 0 0 2px #b8328055}

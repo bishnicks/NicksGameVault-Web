@@ -76,6 +76,7 @@ export const ASSET_MANIFEST = [
     // Furniture / structures the player interacts with — chunky but not
     // cell-sized.
     { ...P('bench',           'Bench',           { w: 1, d: 1 }, 0.50), builder: A.blueBench },
+    { ...P('adventure_girl',  'Adventure Girl',  { w: 1, d: 1 }, 0.55), fitCell: true, flatBase: true, shadowStyle: 'contact' },
     { ...P('signpost',        'Signpost',        { w: 1, d: 1 }, 0.40), builder: A.signpost },
     { ...P('banner',          'Banner',          { w: 1, d: 1 }, 0.45), builder: A.bannerFlag },
 

@@ -12,7 +12,7 @@
 </head>
 <body>
     <a href="#game" class="skip-link">Skip to game</a>
-    <a href="../arcade-launcher.html" class="back-link" aria-label="Back to Nick's Game Vault">← Game Hub</a>
+    <a href="../arcade-launcher.html?v=41" class="back-link" aria-label="Back to Nick's Game Vault">← Game Hub</a>
     <div class="game-shell flappy-shell" id="game">
         <h1>Flappy Bird</h1>
         <div class="gb-scoreboard">
@@ -20,6 +20,10 @@
             <div class="score-item"><span class="score-label">Best</span><span class="score-value" id="best">0</span></div>
         </div>
         <canvas id="canvas" width="320" height="480"></canvas>
+        <div class="flappy-characters" aria-label="Choose your flyer">
+            <button class="flyer-choice selected" data-flyer="bird">Bird</button>
+            <button class="flyer-choice" data-flyer="adventure-girl">Adventure Girl</button>
+        </div>
         <p class="control-hint">Click, Tap, or press Space to flap</p>
         <button class="gb-btn gb-btn-solid" id="start-btn">Start</button>
     </div>

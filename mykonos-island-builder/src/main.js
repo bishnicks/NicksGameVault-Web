@@ -109,6 +109,7 @@ function seedExampleVillage(game) {
     placeO('bougainvillea', 5, 3);
     placeO('olive', 0, 9);
     placeO('flower_pot', 6, 5);
+    placeO('adventure_girl', 7, 5);
     placeO('terracotta_pot', 11, 6);
     placeO('agave', 13, 8);
 

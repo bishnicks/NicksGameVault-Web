@@ -5,6 +5,9 @@
     const scoreEl = document.getElementById('score');
     const bestEl = document.getElementById('best');
     const startBtn = document.getElementById('start-btn');
+    const girlImage = new Image();
+    girlImage.src = 'adventure-girl.png';
+    let selectedFlyer = localStorage.getItem('flappy_flyer') || 'bird';
 
     const W = canvas.width, H = canvas.height;
     const BIRD_SIZE = 18;
@@ -114,7 +117,16 @@
             ctx.fillStyle = '#38b2ac';
         }
 
-        // Bird
+        // Flyer
+        if (selectedFlyer === 'adventure-girl' && girlImage.complete && girlImage.naturalWidth) {
+            const h = 48;
+            const w = h * girlImage.naturalWidth / girlImage.naturalHeight;
+            ctx.save();
+            ctx.shadowBlur = 9;
+            ctx.shadowColor = '#ff77bb';
+            ctx.drawImage(girlImage, bird.x - w / 2, bird.y - h / 2, w, h);
+            ctx.restore();
+        } else {
         ctx.fillStyle = '#ecc94b';
         ctx.beginPath();
         ctx.arc(bird.x, bird.y, BIRD_SIZE, 0, Math.PI * 2);
@@ -135,6 +147,7 @@
         ctx.lineTo(bird.x + BIRD_SIZE + 8, bird.y + 3);
         ctx.lineTo(bird.x + BIRD_SIZE, bird.y + 6);
         ctx.fill();
+        }
 
         // Score overlay
         ctx.fillStyle = 'rgba(255,255,255,0.15)';
@@ -171,9 +184,19 @@
     });
 
     startBtn.addEventListener('click', init);
+    document.querySelectorAll('.flyer-choice').forEach(button => {
+        button.classList.toggle('selected', button.dataset.flyer === selectedFlyer);
+        button.addEventListener('click', () => {
+            selectedFlyer = button.dataset.flyer;
+            localStorage.setItem('flappy_flyer', selectedFlyer);
+            document.querySelectorAll('.flyer-choice').forEach(choice => choice.classList.toggle('selected', choice === button));
+            if (!running) draw();
+        });
+    });
 
     // Draw initial idle state
     bird = { x: 60, y: H / 2, vy: 0 };
     pipes = [];
+    score = 0;
     draw();
 })();
