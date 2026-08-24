@@ -1619,35 +1619,18 @@ function spawnTigerBuddy() {
 function updateTigerBuddy(delta) {
   if (!tigerBuddy || !controls) return;
   const player = controls.getObject().position;
-  let target = null;
-  let targetDistance = 14;
-  zombies.forEach((zombie) => {
-    if (!zombie || !zombie.userData || zombie.userData.isDead || zombie.userData.isFalling) return;
-    const distance = tigerBuddy.position.distanceTo(zombie.position);
-    if (distance < targetDistance) { target = zombie; targetDistance = distance; }
-  });
-
-  const destination = target
-    ? target.position.clone()
-    : new THREE.Vector3(player.x - 2.6, 0, player.z + 3.2);
+  const destination = new THREE.Vector3(player.x - 2.6, 0, player.z + 3.2);
   const path = destination.sub(tigerBuddy.position);
   path.y = 0;
   const distance = path.length();
-  if (distance > (target ? 1.65 : 1.2)) {
+  if (distance > 1.2) {
     path.normalize();
-    tigerBuddy.position.addScaledVector(path, Math.min(distance, (target ? 6.2 : 5) * delta));
+    tigerBuddy.position.addScaledVector(path, Math.min(distance, 5 * delta));
     tigerBuddy.rotation.y = Math.atan2(path.x, path.z);
     tigerBuddy.userData.stride += delta * 9;
     tigerBuddy.position.y = Math.abs(Math.sin(tigerBuddy.userData.stride)) * 0.1;
   } else tigerBuddy.position.y *= 0.8;
-
-  tigerBuddy.userData.attackCooldown = Math.max(0, tigerBuddy.userData.attackCooldown - delta);
-  if (target && targetDistance < 2.1 && tigerBuddy.userData.attackCooldown === 0) {
-    const zombieIndex = zombies.indexOf(target);
-    if (zombieIndex !== -1) hitZombie(target, zombieIndex);
-    tigerBuddy.userData.attackCooldown = 0.8;
-    tigerBuddy.scale.set(1.02, 0.78, 1.08);
-  } else tigerBuddy.scale.lerp(new THREE.Vector3(0.85, 0.85, 0.85), 0.14);
+  tigerBuddy.scale.lerp(new THREE.Vector3(0.85, 0.85, 0.85), 0.14);
   tigerBuddy.userData.aura.material.opacity = 0.28 + Math.sin(performance.now() * 0.004) * 0.1;
 }
 
@@ -3190,6 +3173,18 @@ function setupMobileControls() {
   let lookPointer = null;
   let lastLookX = 0;
   let lastLookY = 0;
+
+  // Safari can otherwise interpret rapid game taps as a page-zoom gesture.
+  let lastTouchEnd = 0;
+  document.addEventListener("dblclick", (event) => event.preventDefault(), { passive: false });
+  ["gesturestart", "gesturechange", "gestureend"].forEach((type) => {
+    document.addEventListener(type, (event) => event.preventDefault(), { passive: false });
+  });
+  document.addEventListener("touchend", (event) => {
+    const now = Date.now();
+    if (now - lastTouchEnd < 350) event.preventDefault();
+    lastTouchEnd = now;
+  }, { passive: false });
 
   const stopMove = () => {
     movePointer = null;
