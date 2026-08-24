@@ -80,6 +80,20 @@ canvas {
   color: #e8e8e8;
 }
 
+/* Keep the play view clear: the compact kill counter is the only top-left stat. */
+#gameUI .info {
+  top: max(8px, env(safe-area-inset-top));
+  left: max(8px, env(safe-area-inset-left));
+  min-width: 0;
+  width: auto;
+  max-width: none;
+  padding: 9px 13px;
+  border-radius: 11px;
+  font-size: 15px;
+}
+#gameUI .info > :not(#killCount) { display: none !important; }
+#gameUI .info #killCount { display: block !important; margin: 0; white-space: nowrap; }
+
 .audio-controls {
   position: absolute;
   bottom: 25px;
