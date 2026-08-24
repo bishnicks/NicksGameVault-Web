@@ -347,6 +347,25 @@
         #start-screen, #start-screen h1, #loading-screen h1, #start-btn::before, #health-bar-inner::after { animation: none; }
       }
     </style>
+    <script>
+      // Use a lighter first-run preset on phones so combat stays responsive.
+      (() => {
+        const mobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || matchMedia("(pointer: coarse)").matches;
+        if (!mobile) return;
+        try {
+          const presetKey = "nicks.kurukshetra.mobilePerformanceV1";
+          if (localStorage.getItem(presetKey)) return;
+          localStorage.setItem("kurukshetra.quality", "low");
+          localStorage.setItem("kurukshetra.gfx.renderScale", "0.72");
+          localStorage.setItem("kurukshetra.gfx.postfx", JSON.stringify({
+            bloom: "off", ssao: "off", godRays: "off", dof: "off",
+            motionBlur: "off", lensFlare: "off", chromatic: "off",
+            sharpen: "off", filmGrain: "off", vignette: "off", heatShimmer: "off"
+          }));
+          localStorage.setItem(presetKey, "1");
+        } catch (_) {}
+      })();
+    </script>
     <script type="module" crossorigin src="./assets/index-C2YJc6Sa.js"></script>
     <link rel="modulepreload" crossorigin href="./assets/three-Bofs28hG.js">
     <link rel="modulepreload" crossorigin href="./assets/SkeletonUtils-Bus5-oEV.js">
