@@ -571,7 +571,7 @@ Dog.createCustomButtons = function() {
 
 	//Apply input events to the next and previous buttons
 	this.nextButton.input.onUp.add(function() {
-		this.game.states.switchState('ZoeFriend');
+		this.game.states.switchState('WhiteTiger');
 	}, this);
 
 
@@ -579,6 +579,64 @@ Dog.createCustomButtons = function() {
 		this.game.states.switchState('Dude');
 	}, this);
 }
+
+
+//Creates an animal character that uses the same changeable expressions as Dog.
+function createAnimalState(name, basePath, previousState, nextState) {
+	var animal = new Play(name);
+
+	animal.preload = function() {
+		this.addSpriteSheet('eyebrows', 'assets/img/character/dog/eyebrows.png', 387, 472, false);
+		this.addSpriteSheet('eyes', 'assets/img/character/dog/eyes.png', 406, 536, false);
+		this.addSpriteSheet('mouth', 'assets/img/character/dog/mouth.png', 425, 727, false);
+		this.addImage('base', basePath, false);
+		this.background = new Kiwi.GameObjects.StaticImage(this, this.textures['dog-bg']);
+		this.addChild(this.background);
+		Play.prototype.preload.call(this);
+	};
+
+	animal.loadComplete = function() {
+		Play.prototype.loadComplete.call(this);
+		this.background.exists = false;
+		this.background.visible = false;
+	};
+
+	animal.createDressup = function() {
+		this.background = new Kiwi.GameObjects.StaticImage(this, this.textures['dog-bg'], 0, 0);
+		this.dressUpElements = [];
+		this.buttons = [];
+		var base = new Kiwi.GameObjects.StaticImage(this, this.textures.base, 0, 0);
+		var eyes = new Option(this, this.textures.eyes, 0, 0);
+		var eyebrows = new Option(this, this.textures.eyebrows, 0, 0);
+		var mouth = new Option(this, this.textures.mouth, 0, 0);
+		this.dressUpElements = [eyes, eyebrows, mouth];
+		this.createButton(this.textures.eyebrowsBtn, 10, eyebrows);
+		this.createButton(this.textures.eyesBtn, 121, eyes);
+		this.createButton(this.textures.mouthBtn, 232, mouth);
+		this.addChild(this.background);
+		this.addChild(base);
+		for(var i = 0; i < this.dressUpElements.length; i++) this.addChild(this.dressUpElements[i]);
+		for(var j = 0; j < this.buttons.length; j++) this.addChild(this.buttons[j]);
+	};
+
+	animal.createButton = function(btnTexture, y, dressUpItem) {
+		var button = new Kiwi.GameObjects.Sprite(this, btnTexture, 10, y);
+		this.buttons.push(button);
+		button.input.onUp.add(dressUpItem.next, dressUpItem);
+	};
+
+	animal.createCustomButtons = function() {
+		Play.prototype.createCustomButtons.call(this);
+		this.nextButton.input.onUp.add(function() { this.game.states.switchState(nextState); }, this);
+		this.prevButton.input.onUp.add(function() { this.game.states.switchState(previousState); }, this);
+	};
+
+	return animal;
+}
+
+var WhiteTiger = createAnimalState('WhiteTiger', 'assets/img/character/white-tiger/outfit/base.png', 'Dog', 'RedPanda');
+var RedPanda = createAnimalState('RedPanda', 'assets/img/character/red-panda/outfit/base.png', 'WhiteTiger', 'Fox');
+var Fox = createAnimalState('Fox', 'assets/img/character/fox/outfit/base.png', 'RedPanda', 'ZoeFriend');
 
 
 
@@ -1035,7 +1093,7 @@ ZoeFriend.createCustomButtons = function() {
 
 
 	this.prevButton.input.onUp.add(function() {
-		this.game.states.switchState('Dog');
+		this.game.states.switchState('Fox');
 	}, this);
 }
 
@@ -1079,6 +1137,9 @@ game.states.addState(Zoe);
 game.states.addState(Dog);
 game.states.addState(Dude);
 game.states.addState(ZoeFriend);
+game.states.addState(WhiteTiger);
+game.states.addState(RedPanda);
+game.states.addState(Fox);
 
 
 //Switch to/use the Preloader state. 
